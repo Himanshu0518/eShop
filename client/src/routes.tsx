@@ -1,9 +1,7 @@
 
 import { createBrowserRouter } from "react-router";
 import RootLayout from "@/layout/RootLayout";
-import Home from "@/pages/Home";
-import Cart from "@/pages/Cart";
-import Favourite from "@/pages/Favourite";
+import { Home, Cart, Favourite, SignupPage, Contact, Orders, LoginPage } from "@/pages";
 
 const router = createBrowserRouter([
   {
@@ -24,14 +22,22 @@ const router = createBrowserRouter([
       },
       {
         path: "/contact",
-        element: <h1>Contact</h1>,
+        element: <Contact />,
       },
       {
         path: "/orders",
-        element: <h1>Orders</h1>,
+        element: <Orders />,
       },
     ],
   },
+  {
+    path: "/signup",
+    element: <SignupPage />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  }
 
 ]);
 
