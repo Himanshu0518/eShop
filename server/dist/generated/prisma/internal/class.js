@@ -45,62 +45,32 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPrismaClientClass = getPrismaClientClass;
-const runtime = __importStar(require("@prisma/client/runtime/library"));
+const runtime = __importStar(require("@prisma/client/runtime/client"));
 const config = {
-    "generator": {
-        "name": "client",
-        "provider": {
-            "fromEnvVar": null,
-            "value": "prisma-client"
-        },
-        "output": {
-            "value": "C:\\Users\\hs787\\Desktop\\eShop\\server\\generated\\prisma",
-            "fromEnvVar": null
-        },
-        "config": {
-            "engineType": "library"
-        },
-        "binaryTargets": [
-            {
-                "fromEnvVar": null,
-                "value": "windows",
-                "native": true
-            }
-        ],
-        "previewFeatures": [],
-        "sourceFilePath": "C:\\Users\\hs787\\Desktop\\eShop\\server\\prisma\\schema.prisma",
-        "isCustomOutput": true
-    },
-    "relativePath": "../../prisma",
-    "clientVersion": "6.19.0",
-    "engineVersion": "2ba551f319ab1df4bc874a89965d8b3641056773",
-    "datasourceNames": [
-        "db"
-    ],
+    "previewFeatures": [],
+    "clientVersion": "7.0.0",
+    "engineVersion": "0c19ccc313cf9911a90d99d2ac2eb0280c76c513",
     "activeProvider": "postgresql",
-    "postinstall": false,
-    "inlineDatasources": {
-        "db": {
-            "url": {
-                "fromEnvVar": "DATABASE_URL",
-                "value": null
-            }
-        }
-    },
-    "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n",
-    "inlineSchemaHash": "39ac28d186f1400e7d3fe83bcf93c2ef2c93d00f3eb4ea4ccba52368d26b476f",
-    "copyEngine": true,
+    "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel User {\n  id        Int        @id @default(autoincrement())\n  email     String     @unique\n  name      String?\n  password  String\n  img       String?\n  isAdmin   Boolean    @default(false)\n  createdAt DateTime   @default(now())\n  updatedAt DateTime   @updatedAt\n  // relations \n  orders    Order[]\n  cartItems CartItem[]\n  favorites favorite[]\n}\n\nmodel Product {\n  id          Int      @id @default(autoincrement())\n  name        String\n  description String?\n  price       Float\n  discount    Float    @default(0)\n  img         String?\n  category    String[]\n  sizes       String[]\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\n\n  //  relations\n  cartItems CartItem[]\n  favorites favorite[]\n}\n\nmodel Order {\n  id         Int      @id @default(autoincrement())\n  userId     Int\n  totalPrice Float\n  status     String   @default(\"PENDING\")\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n\n  user User @relation(fields: [userId], references: [id])\n}\n\nmodel CartItem {\n  id        Int      @id @default(autoincrement())\n  userId    Int\n  productId Int\n  quantity  Int      @default(1)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  user    User    @relation(fields: [userId], references: [id])\n  product Product @relation(fields: [productId], references: [id])\n}\n\nmodel favorite {\n  id        Int      @id @default(autoincrement())\n  userId    Int\n  productId Int\n  createdAt DateTime @default(now())\n\n  user    User    @relation(fields: [userId], references: [id])\n  product Product @relation(fields: [productId], references: [id])\n}\n",
     "runtimeDataModel": {
         "models": {},
         "enums": {},
         "types": {}
-    },
-    "dirname": ""
+    }
 };
-config.runtimeDataModel = JSON.parse("{\"models\":{},\"enums\":{},\"types\":{}}");
-config.engineWasm = undefined;
-config.compilerWasm = undefined;
-function getPrismaClientClass(dirname) {
-    config.dirname = dirname;
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"img\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isAdmin\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"orders\",\"kind\":\"object\",\"type\":\"Order\",\"relationName\":\"OrderToUser\"},{\"name\":\"cartItems\",\"kind\":\"object\",\"type\":\"CartItem\",\"relationName\":\"CartItemToUser\"},{\"name\":\"favorites\",\"kind\":\"object\",\"type\":\"favorite\",\"relationName\":\"UserTofavorite\"}],\"dbName\":null},\"Product\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"price\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"discount\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"img\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"category\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sizes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"cartItems\",\"kind\":\"object\",\"type\":\"CartItem\",\"relationName\":\"CartItemToProduct\"},{\"name\":\"favorites\",\"kind\":\"object\",\"type\":\"favorite\",\"relationName\":\"ProductTofavorite\"}],\"dbName\":null},\"Order\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"totalPrice\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"OrderToUser\"}],\"dbName\":null},\"CartItem\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"productId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"quantity\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"CartItemToUser\"},{\"name\":\"product\",\"kind\":\"object\",\"type\":\"Product\",\"relationName\":\"CartItemToProduct\"}],\"dbName\":null},\"favorite\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"productId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"UserTofavorite\"},{\"name\":\"product\",\"kind\":\"object\",\"type\":\"Product\",\"relationName\":\"ProductTofavorite\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}");
+async function decodeBase64AsWasm(wasmBase64) {
+    const { Buffer } = await import('node:buffer');
+    const wasmArray = Buffer.from(wasmBase64, 'base64');
+    return new WebAssembly.Module(wasmArray);
+}
+config.compilerWasm = {
+    getRuntime: async () => await import("@prisma/client/runtime/query_compiler_bg.postgresql.mjs"),
+    getQueryCompilerWasmModule: async () => {
+        const { wasm } = await import("@prisma/client/runtime/query_compiler_bg.postgresql.wasm-base64.mjs");
+        return await decodeBase64AsWasm(wasm);
+    }
+};
+function getPrismaClientClass() {
     return runtime.getPrismaClient(config);
 }

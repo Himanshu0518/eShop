@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { FaSearch, FaShoppingCart } from "react-icons/fa";
 import { MdFavorite, MdMenu } from "react-icons/md";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+import ProfileAvatar from "./ProfileAvatar";
 import { ModeToggle } from "@/components/ThemeToggleMode";
 import {
   Sheet,
@@ -11,7 +12,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+
 import { useState } from "react";
+
 
 const NavItems = [
   { name: "Home", path: "/" },
@@ -23,6 +26,7 @@ const NavItems = [
 
 function NavBar() {
   const [isActive, setIsActive] = useState<string>("Home");
+ 
 
   return (
     <nav className="sticky top-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border shadow-sm transition-all duration-300">
@@ -68,7 +72,7 @@ function NavBar() {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center  space-x-1 md:space-x-3">
             <ModeToggle />
 
             <button
@@ -94,13 +98,7 @@ function NavBar() {
                 0
               </span>
             </button>
-
-            <Avatar className="h-9 w-9 border-2 border-border hover:border-primary transition-colors duration-200 cursor-pointer">
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback className="bg-primary text-primary-foreground">
-                CN
-              </AvatarFallback>
-            </Avatar>
+            <ProfileAvatar />
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import NavBar from "@/components/NavBar";
 import { Outlet } from "react-router-dom";
+import {Toaster} from '@/components/ui/sonner';
 
 function RootLayout() {
   return (
@@ -7,6 +8,7 @@ function RootLayout() {
       <NavBar />
       <main className="grow container mx-auto px-4 py-8">
         <Outlet />
+        <Toaster position="top-right" />
       </main>
     </div>
   );

@@ -47,7 +47,6 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Prisma = exports.PrismaClient = exports.$Enums = void 0;
-const process = __importStar(require("node:process"));
 const path = __importStar(require("node:path"));
 const node_url_1 = require("node:url");
 globalThis['__dirname'] = path.dirname((0, node_url_1.fileURLToPath)(import.meta.url));
@@ -69,7 +68,4 @@ __exportStar(require("./enums.js"), exports);
  *
  * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
  */
-exports.PrismaClient = $Class.getPrismaClientClass(__dirname);
-// file annotations for bundling tools to include these files
-path.join(__dirname, "query_engine-windows.dll.node");
-path.join(process.cwd(), "generated/prisma/query_engine-windows.dll.node");
+exports.PrismaClient = $Class.getPrismaClientClass();

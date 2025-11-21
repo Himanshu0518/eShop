@@ -3,8 +3,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { Link } from "react-router-dom"
+import { useSignUpMutation } from "@/services/user.services"
+import Spinner from "@/components/Spinner"
+import type { ApiError } from "@/types/user.types"
+import { useEffect } from "react"
+import {toast} from 'sonner';
+import { useNavigate } from "react-router-dom"
 
 function SignupPage() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -12,8 +19,18 @@ function SignupPage() {
     confirmPassword: ''
   })
 
-  const handleSubmit = (e) => {
+  const [signUp, { error, isLoading, isSuccess }] = useSignUpMutation();
+    useEffect(() => {
+    if (isSuccess) {
+
+     navigate("/");
+      toast.success("you are logged in successfully!");
+    }
+  }, [isSuccess, navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    await signUp(formData)
     console.log('Form submitted:', formData)
   }
 
@@ -82,6 +99,11 @@ function SignupPage() {
                   onChange={handleChange}
                   className="h-12 border-slate-300 focus:border-slate-900 rounded-none"
                 />
+                 {error && (error as ApiError)?.data?.errors?.name && (
+                                  <p className="text-xs text-red-600 mt-1">
+                                    {(error as ApiError).data.errors.name}
+                                  </p>
+                                )}
               </div>
 
               <div className="space-y-2">
@@ -96,6 +118,11 @@ function SignupPage() {
                   onChange={handleChange}
                   className="h-12 border-slate-300 focus:border-slate-900 rounded-none"
                 />
+                 {error && (error as ApiError)?.data?.errors?.email && (
+                                  <p className="text-xs text-red-600 mt-1">
+                                    {(error as ApiError).data.errors.email}
+                                  </p>
+                                )}
               </div>
 
               <div className="space-y-2">
@@ -124,14 +151,34 @@ function SignupPage() {
                   onChange={handleChange}
                   className="h-12 border-slate-300 focus:border-slate-900 rounded-none"
                 />
+                  {error && (error as ApiError)?.data?.errors?.password && (
+                                  <p className="text-xs text-red-600 mt-1">
+                                    {(error as ApiError).data.errors.password}
+                                  </p>
+                                )}
               </div>
 
-              <Button 
+
+         {
+              isLoading ? (
+                 <Spinner />
+              ) : (
+                 <Button 
                 onClick={handleSubmit}
                 className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white rounded-none text-sm uppercase tracking-wider font-medium transition-colors"
               >
                 Create Account
               </Button>
+              )
+         }
+         {
+          error && (
+            <p className="text-xs text-red-600 mt-1 text-center">
+              {(error as ApiError).data.message}
+            </p>
+          )
+         }
+              
             </div>
 
             <div className="relative">

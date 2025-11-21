@@ -1,5 +1,4 @@
-
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter } from "react-router-dom";
 import RootLayout from "@/layout/RootLayout";
 import { Home, Cart, Favourite, SignupPage, Contact, Orders, LoginPage } from "@/pages";
 
@@ -9,23 +8,23 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       {
-        path: "/",
+        index: true, // matches "/"
         element: <Home />,
       },
       {
-        path: "/cart",
+        path: "cart", // matches "/cart"
         element: <Cart />,
       },
       {
-        path: "/favourite",
+        path: "favourite",
         element: <Favourite />,
       },
       {
-        path: "/contact",
+        path: "contact",
         element: <Contact />,
       },
       {
-        path: "/orders",
+        path: "orders",
         element: <Orders />,
       },
     ],
@@ -38,8 +37,6 @@ const router = createBrowserRouter([
     path: "/login",
     element: <LoginPage />,
   }
-
 ]);
-
 
 export default router;

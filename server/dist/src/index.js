@@ -27,6 +27,7 @@ app.use((0, helmet_1.default)());
 app.get('/', (_, res) => {
     res.status(200).json({ message: 'Server is running' });
 });
+// all routes will be here
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
