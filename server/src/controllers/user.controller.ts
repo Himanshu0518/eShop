@@ -99,7 +99,7 @@ const LoginUser = asyncHandler(async (req: Request, res: Response) => {
     
 })
 
-const LogoutUser = asyncHandler(async (req: Request, res: Response) => {
+const LogoutUser = asyncHandler(async (_: Request, res: Response) => {
 
     return res
     .status(200)

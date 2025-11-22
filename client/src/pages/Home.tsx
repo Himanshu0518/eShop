@@ -1,13 +1,23 @@
+import Hero from "@/components/Hero";
+import FeaturedCategories from "@/components/FeaturedCategories";
+import NewArrivals from "@/components/NewArrivals";
+import PromoSection from "@/components/PromoSection";
+import Features from "@/components/Features";
+import Newsletter from "@/components/Newsletter";
+import Footer from "@/components/Footer";
 
-import Hero from "@/components/Hero"
 function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center">
-
-<Hero />
-
-    </div>
-  )
+    <>
+      <Hero />
+      <Features />
+      <FeaturedCategories />
+      <NewArrivals />
+      <PromoSection />
+      <Newsletter />
+      <Footer />
+    </>
+  );
 }
 
-export default Home
+export default Home;

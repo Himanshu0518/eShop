@@ -14,10 +14,12 @@ export interface Product {
 
 export interface ProductListResponse {
   success: boolean;
-  products: Product[];
+  message: string;
+  data: Product[];
 }
 
 export interface ProductDetailResponse {
   success: boolean;
-  product: Product;
+  message: string;
+  data: Product;
 }

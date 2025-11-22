@@ -1,17 +1,22 @@
 import { configureStore } from '@reduxjs/toolkit'
-// Or from '@reduxjs/toolkit/query/react'
 import { setupListeners } from '@reduxjs/toolkit/query'
-import { userApi } from '../services/user.services'
+import { userApi } from '@/services/user.services'
+import { productApi } from '@/services/product.services'
+import { cartApi } from '@/services/cart.services'
 
 export const store = configureStore({
   reducer: {
-    // Add the generated reducer as a specific top-level slice
     [userApi.reducerPath]: userApi.reducer,
+    [cartApi.reducerPath]: cartApi.reducer,
+    [productApi.reducerPath]: productApi.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(userApi.middleware),
+    getDefaultMiddleware().concat(
+      userApi.middleware,
+      cartApi.middleware,
+      productApi.middleware
+    ),
 })
-
 
 setupListeners(store.dispatch)

@@ -1,6 +1,14 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from 'express';
+import {v2 as cloudinary} from 'cloudinary';
+import  fs from 'fs';
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 type AsyncFunction = (req: Request, res: Response, next: NextFunction) => Promise<void|any>;
 
@@ -37,3 +45,41 @@ export const verifyAuthToken = (token: string): any => {
     return jwt.verify(token, process.env.JWT_SECRET as string);
 }
 
+export const uploadToCloudinary = async (localfilePath:string)=>{
+ console.log(localfilePath)
+    try{
+        const uploadResult = await cloudinary.uploader
+       .upload(
+           localfilePath, {
+               resource_type:"auto",
+           } )
+           
+           fs.unlinkSync(localfilePath)
+           return uploadResult
+    }
+    catch{
+     fs.unlinkSync(localfilePath)
+     return  null 
+    }
+}
+
+export const deleteFromCloudinary = async (publicId:string)=>{
+    try{
+        const deleteResult = await cloudinary.uploader.destroy(publicId)
+        return deleteResult
+    }
+    catch{
+        return null
+    }
+}
+
+export const NormalizeString = (str:string):string[]=>{
+   
+   const strArray = Array.isArray(str) 
+            ? str 
+            : typeof str === 'string' 
+                ? str.split(',').map(c => c.trim()) 
+                : [str];
+
+    return strArray;
+}

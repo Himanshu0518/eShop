@@ -7,7 +7,7 @@ import "dotenv/config";
 
 const app: Application = express();
 
-console.log("Environment:", process.env.PORT);
+
 const port = process.env.PORT ;
 
 
@@ -39,7 +39,13 @@ app.get('/', (_: Request, res: Response) => {
 
 // all routes will be here
 import userRoutes from './routes/user.routes';
+import productRoutes from './routes/product.routes';
+import cartRoutes from './routes/cart.routes';
+import favouriteRoutes from './routes/favourite.routes';
 
+app.use('/api/favourites', favouriteRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes);
 app.use('/api/users', userRoutes);
 
 app.listen(port, () => {

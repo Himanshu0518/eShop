@@ -35,8 +35,8 @@ model Product {
   price       Float
   discount    Float    @default(0)
   img         String?
-  category    String[]
-  sizes       String[]
+  category    String[] // men,women,kids,accessories,new arrivals
+  sizes       String[] // S, M, L, XL, XXL
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

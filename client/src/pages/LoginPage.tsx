@@ -1,14 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { Link } from "react-router";
+import { useState, useEffect, type FormEvent, type ChangeEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/services/user.services";
-import  Spinner  from "@/components/Spinner";
+import Spinner from "@/components/Spinner";
 import type { ApiError } from "@/types/user.types";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import {toast} from 'sonner';
+import { toast } from "sonner";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -19,27 +17,23 @@ function LoginPage() {
 
   const [login, { error, isLoading, isSuccess }] = useLoginMutation();
 
-   useEffect(() => {
+  useEffect(() => {
     if (isSuccess) {
-
-     navigate("/");
-      toast.success("you are logged in successfully!");
+      navigate("/");
+      toast.success("You are logged in successfully!");
     }
   }, [isSuccess, navigate]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
       await login(formData).unwrap();
-      // Handle successful login (e.g., redirect, show message)
-      
-    } catch (error) {
-      // Handle login error (e.g., show error message)
-      console.error("Login failed:", error);
+    } catch (err) {
+      console.error("Login failed:", err);
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.id]: e.target.value,
@@ -47,27 +41,28 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-white">
+    <div className="min-h-screen flex bg-background">
       {/* Left Side - Image */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-br from-slate-900 to-slate-700">
-          <div className="absolute inset-0 bg-black/20">
-            <img
-              src="/AuthImage.png"
-              alt="Signup Background"
-              className="w-full h-full object-cover opacity-80"
-            />
-          </div>
+        <div className="absolute inset-0">
+          <img
+            src="/AuthImage.png"
+            alt="Login Background"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/40" />
         </div>
         <div className="relative z-10 flex flex-col justify-between p-12 text-white">
           <div>
-            <Link to="/" className="text-5xl font-light tracking-tight mb-4">
+            <Link to="/" className="text-4xl font-light tracking-tight">
               eShop
             </Link>
-            <p className="text-lg font-light opacity-90">Elevate your style</p>
+            <p className="mt-2 text-base font-light opacity-80">
+              Elevate your style
+            </p>
           </div>
-          <div className="space-y-4">
-            <p className="text-sm font-light opacity-80 max-w-md">
+          <div>
+            <p className="text-sm font-light opacity-70 max-w-md leading-relaxed">
               Join thousands of fashion enthusiasts who trust eShop for curated
               collections and exclusive designs.
             </p>
@@ -76,30 +71,28 @@ function LoginPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-12">
-        <div className="w-full max-w-md">
+      <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-16">
+        <div className="w-full max-w-sm">
           {/* Mobile Logo */}
-          <div className="lg:hidden mb-8 text-center">
-            <Link to="/" className="text-5xl font-light tracking-tight mb-4">
+          <div className="lg:hidden mb-10 text-center">
+            <Link to="/" className="text-3xl font-light tracking-tight">
               eShop
             </Link>
           </div>
 
           <div className="space-y-8">
             <div className="space-y-2">
-              <h2 className="text-3xl font-light tracking-tight text-slate-900">
-                Login
-              </h2>
-              <p className="text-sm text-slate-600 font-light">
-                Welcome back! Please enter your details.
+              <h2 className="text-2xl font-light tracking-tight">Welcome back</h2>
+              <p className="text-sm text-muted-foreground">
+                Enter your credentials to access your account
               </p>
             </div>
 
-            <div className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
                 <Label
                   htmlFor="email"
-                  className="text-xs uppercase tracking-wide text-slate-700 font-medium"
+                  className="text-xs tracking-wider uppercase text-muted-foreground"
                 >
                   Email
                 </Label>
@@ -109,10 +102,10 @@ function LoginPage() {
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={handleChange}
-                  className="h-12 border-slate-300 focus:border-slate-900 rounded-none"
+                  className="h-11 rounded-none border-border focus:border-foreground transition-colors"
                 />
                 {error && (error as ApiError)?.data?.errors?.email && (
-                  <p className="text-xs text-red-600 mt-1">
+                  <p className="text-xs text-destructive">
                     {(error as ApiError).data.errors.email}
                   </p>
                 )}
@@ -121,62 +114,63 @@ function LoginPage() {
               <div className="space-y-2">
                 <Label
                   htmlFor="password"
-                  className="text-xs uppercase tracking-wide text-slate-700 font-medium"
+                  className="text-xs tracking-wider uppercase text-muted-foreground"
                 >
                   Password
                 </Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Create a password"
+                  placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
-                  className="h-12 border-slate-300 focus:border-slate-900 rounded-none"
+                  className="h-11 rounded-none border-border focus:border-foreground transition-colors"
                 />
-
                 {error && (error as ApiError)?.data?.errors?.password && (
-                  <p className="text-xs text-red-600 mt-1">
+                  <p className="text-xs text-destructive">
                     {(error as ApiError).data.errors.password}
                   </p>
                 )}
               </div>
- 
-              {isLoading ? (
-                <div className="flex justify-center">
-                  <Spinner />
-                </div>
-              ) : (
-                <Button
-                  onClick={handleSubmit}
-                  className="w-full h-12 cursor-pointer bg-slate-900 hover:bg-slate-800 text-white rounded-none text-sm uppercase tracking-wider font-medium transition-colors"
+
+              <div className="flex justify-end">
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Login
-                </Button>
-              )}
-            </div>
+                  Forgot password?
+                </Link>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-11 rounded-none text-xs tracking-widest uppercase font-medium"
+              >
+                {isLoading ? <Spinner className="h-4 w-4" /> : "Sign In"}
+              </Button>
+            </form>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200"></div>
+                <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-4 text-slate-500 tracking-wide">
+                <span className="bg-background px-4 text-muted-foreground tracking-wider">
                   Or
                 </span>
               </div>
             </div>
 
-            <div className="text-center text-sm">
-              <span className="text-slate-600 font-light">
-                Do not have an account create one?{" "}
-              </span>
+            <p className="text-center text-sm text-muted-foreground">
+              Don't have an account?{" "}
               <Link
                 to="/signup"
-                className="text-slate-900 font-medium hover:underline underline-offset-4"
+                className="text-foreground font-medium hover:underline underline-offset-4"
               >
-                Sign Up
+                Create one
               </Link>
-            </div>
+            </p>
           </div>
         </div>
       </div>
