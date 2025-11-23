@@ -49,7 +49,26 @@ export const userApi = createApi({
       providesTags: ["User"]
     }),
 
-   
+ logOut: builder.mutation<AuthResponse, void>({
+  query: () => ({
+    url: '/users/logout',
+    method: 'GET',
+  }),
+  async onQueryStarted(_, { dispatch, queryFulfilled }) {
+    try {
+      await queryFulfilled;
+      
+      // Clear token from localStorage
+      localStorage.removeItem("token");
+      
+      // Reset the entire API state
+      dispatch(userApi.util.resetApiState());
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  },
+  invalidatesTags: ["User"]
+})
   
   }),
 });
@@ -59,4 +78,5 @@ export const {
   useSignUpMutation,
   useLoginMutation,
   useCurrentUserQuery,
+  useLogOutMutation
 } = userApi;

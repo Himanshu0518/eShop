@@ -10,12 +10,22 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCurrentUserQuery } from "@/services/user.services";
 import { Link } from "react-router";
+import { useLogOutMutation } from "@/services/user.services";
+import { useNavigate } from "react-router-dom";
 
 function ProfileAvatar() {
   const { data: user } = useCurrentUserQuery();
+const [logOut, { isLoading }] = useLogOutMutation();
+const navigate = useNavigate();
 
-  const handleLogout = () => {};
-
+const handleLogout = async () => {
+  try {
+    await logOut().unwrap();
+    navigate("/login", { replace: true });
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
   return (
     <div>
       {user ? (

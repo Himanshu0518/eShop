@@ -1,6 +1,7 @@
 import NavBar from "@/components/NavBar";
 import { Outlet } from "react-router-dom";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
+import Footer from "@/components/Footer";
 
 function RootLayout() {
   return (
@@ -9,7 +10,9 @@ function RootLayout() {
       <main className="grow">
         <Outlet />
       </main>
-      <Toaster position="top-right" />
+       <Footer />
+
+      <Toaster position="top-right" richColors />
     </div>
   );
 }

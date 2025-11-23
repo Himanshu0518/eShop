@@ -7,9 +7,9 @@ export default function Women() {
   const { data: products, error, isLoading, isSuccess } = useGetProductsQuery();
 
   // Filter only men's products
- const menProducts =
+ const womenProducts =
   products?.data?.filter((product) =>
-    product.category.some((c) => c.toLowerCase() === "men")
+    product.category.some((c) => c.toLowerCase() === "women")
   ) || [];
 
 
@@ -23,7 +23,7 @@ export default function Women() {
               New Collection
             </span>
             <h2 className="mt-4 text-5xl md:text-6xl font-light tracking-tight text-black">
-              Men's
+              Women's
             </h2>
           </div>
           <div className="h-px w-16 bg-black"></div>
@@ -65,10 +65,10 @@ export default function Women() {
         )}
 
         {/* Empty State */}
-        {isSuccess && menProducts.length === 0 && (
+        {isSuccess && womenProducts.length === 0 && (
           <div className="flex items-center justify-center py-32">
             <div className="text-center">
-              <p className="text-sm font-light text-gray-600 mb-6">No men's products available</p>
+              <p className="text-sm font-light text-gray-600 mb-6">No women's products available</p>
               <Link
                 to="/new-arrivals"
                 className="inline-flex items-center gap-2 text-xs font-light text-black tracking-widest uppercase hover:text-gray-600 transition-colors"
@@ -81,10 +81,10 @@ export default function Women() {
         )}
 
         {/* Products Grid */}
-        {isSuccess && menProducts.length > 0 && (
+        {isSuccess && womenProducts.length > 0 && (
           <>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 lg:gap-8 mb-16">
-              {menProducts.map((product) => (
+              {womenProducts.map((product) => (
                 <Link to={`/product/${product.id}`} key={product.id} className="group">
                   <div className="space-y-6">
                     {/* Image */}
@@ -99,9 +99,7 @@ export default function Women() {
                     {/* Info */}
                     <div className="space-y-3">
                       <div>
-                        <p className="text-xs font-light text-gray-500 tracking-widest uppercase mb-2">
-                          {product.category}
-                        </p>
+                       
                         <h3 className="text-sm font-light text-black group-hover:text-gray-600 transition-colors leading-snug">
                           {product.name}
                         </h3>

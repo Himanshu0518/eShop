@@ -30,36 +30,37 @@ export const ProtectedRoute = ({
   const { data: currentUser, isLoading, isError, isSuccess } = useCurrentUserQuery();
 
   useEffect(() => {
-    if (isSuccess) {
-      // User is authenticated
-      if (authentication && !currentUser?.data.token) {
-        navigate("/login", {
-          state: { from: location },
-          replace: true,
-        });
-        return;
-      }
-
-      // User is NOT authenticated (trying to access public route)
-      if (!authentication && currentUser?.data.token) {
-        navigate("/", {
-          state: { from: location },
-          replace: true,
-        });
-        return;
-      }
+  if (isSuccess) {
+    const isAuthenticated = currentUser?.data?.token;
+    
+    // User should be authenticated but isn't
+    if (authentication && !isAuthenticated) {
+      navigate("/login", {
+        state: { from: location },
+        replace: true,
+      });
+      return;
     }
 
-    if (isError) {
-      // If authentication is required and there's an error, redirect to login
-      if (authentication) {
-        navigate("/login", {
-          state: { from: location },
-          replace: true,
-        });
-      }
+    // User shouldn't be authenticated but is
+    if (!authentication && isAuthenticated) {
+      navigate("/", {
+        state: { from: location },
+        replace: true,
+      });
+      return;
     }
-  }, [isSuccess, isError, currentUser, authentication, navigate, location]);
+  }
+
+  if (isError && authentication) {
+    // Clear any stale tokens
+    localStorage.removeItem("token");
+    navigate("/login", {
+      state: { from: location },
+      replace: true,
+    });
+  }
+}, [isSuccess, isError, currentUser, authentication, navigate, location]);
 
   // Loading state
   if (isLoading) {
