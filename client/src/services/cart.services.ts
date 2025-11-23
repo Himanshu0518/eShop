@@ -47,12 +47,13 @@ export const cartApi = createApi({
       invalidatesTags: ["Cart"]
     }),
 
-    updateQuantity: builder.mutation<CartResponse, { productId: number; quantity: number }>({
-        query: ({ productId, quantity }) => ({
-          url: `/cart/update_qty/${productId}`,
+    updateQuantity: builder.mutation<CartResponse, { cartItemId: number; quantity: number }>({
+        query: ({ cartItemId, quantity }) => ({
+          url: `/cart/update_qty/${cartItemId}`,
           method: "PUT",
           body: { quantity }
         }),
+        invalidatesTags: ["Cart"]
     }),
 
         // ---------------- ORDERS ----------------

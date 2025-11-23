@@ -9,7 +9,7 @@ router.route('/getAll').get(VerifyJWT,getAllfavourite );
 
 router.route('/add').post(VerifyJWT,addToFavourite );
 
-router.route('/remove/:productId').delete(VerifyJWT,removeFromFavorite );
+router.route('/remove/:favId').delete(VerifyJWT,removeFromFavorite );
 
 router.route('/toggle/:productId').put(VerifyJWT,toggleFavourite );
 

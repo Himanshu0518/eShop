@@ -56,13 +56,12 @@ const getAllfavourite = asyncHandler(async (req, res) => {
 
 
 const removeFromFavorite = asyncHandler(async (req, res) => {
-
-    const { productId } = req.params;
+   const {favId} = req.params;
 
     try{
-        await prisma.cartItem.delete({
+        await prisma.favorite.delete({
             where:{
-                id:parseInt(productId)
+                id:parseInt(favId)
             }
         });
         return res.status(200).json({

@@ -1,42 +1,102 @@
 import { createBrowserRouter } from "react-router-dom";
 import RootLayout from "@/layout/RootLayout";
-import { Home, Cart, Favourite, SignupPage, Contact, Orders, LoginPage } from "@/pages";
+import AuthLayout from "@/layout/AuthLayout";
+import {
+  Home,
+  Cart,
+  Favourite,
+  SignupPage,
+  Contact,
+  Orders,
+  LoginPage,
+  Men,
+  Women,
+  Kids,
+  Accessories,
+  NewArrivals,
+} from "@/pages";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
     children: [
+      // Protected routes (requires authentication)
       {
-        index: true, // matches "/"
-        element: <Home />,
+        element: <AuthLayout authentication={true} />,
+        children: [
+          
+          {
+            path: "cart",
+            element: <Cart />,
+          },
+          {
+            path: "favourite",
+            element: <Favourite />,
+          },
+          {
+            path: "orders",
+            element: <Orders />,
+          },
+        ],
+      },
+
+      // Public routes (no authentication required)
+      {
+            index: true,
+            element: <Home />,
+          },
+      {
+        path: "category/men",
+        element: <Men />,
       },
       {
-        path: "cart", // matches "/cart"
-        element: <Cart />,
+        path: "category/women",
+        element: <Women />,
       },
       {
-        path: "favourite",
-        element: <Favourite />,
+        path: "category/kids",
+        element: <Kids />,
+      },
+      {
+        path: "category/accessories",
+        element: <Accessories />,
       },
       {
         path: "contact",
         element: <Contact />,
       },
       {
-        path: "orders",
-        element: <Orders />,
+        path: "new-arrivals",
+        element: <NewArrivals />,
+      },
+    ],
+  },
+
+  // Auth routes (public, redirect if already logged in)
+  {
+    path: "/signup",
+    element: <AuthLayout authentication={false} />,
+    children: [
+      {
+        index: true,
+        element: <SignupPage />,
       },
     ],
   },
   {
-    path: "/signup",
-    element: <SignupPage />,
-  },
-  {
     path: "/login",
-    element: <LoginPage />,
-  }
+    element: <AuthLayout authentication={false} />,
+    children: [
+      {
+        index: true,
+        element: <LoginPage />,
+      },
+    ],
+  },
+
+  // 404 Fallback
+  
 ]);
 
 export default router;

@@ -1,15 +1,14 @@
-import { ArrowRight } from "lucide-react";
+
 import { Link } from "react-router-dom";
 import { useGetProductsQuery } from "@/services/product.services";
-import Spinner from "./Spinner";
+import Spinner from "@/components/Spinner";
 
 
 export default function NewArrivals() {
 
   const { data: products, error, isLoading, isSuccess } = useGetProductsQuery();
  
-  
-  
+
 
   return (
     <section className="py-20 md:py-32 px-6 md:px-16 lg:px-24 bg-muted/30">
@@ -24,13 +23,7 @@ export default function NewArrivals() {
               New Arrivals
             </h2>
           </div>
-          <Link
-            to="/new-arrivals"
-            className="group flex items-center gap-2 text-sm tracking-wider hover:gap-3 transition-all duration-300"
-          >
-            View All
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          
         </div>
 {/* Loading State */}
        {isLoading && (

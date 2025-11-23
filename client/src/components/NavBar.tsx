@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Search, ShoppingBag, Heart, Menu } from "lucide-react";
+import { Search, ShoppingCart, Heart, Menu } from "lucide-react";
 import { ModeToggle } from "@/components/ThemeToggleMode";
 import ProfileAvatar from "./ProfileAvatar";
 import {
@@ -80,7 +80,7 @@ function NavBar() {
               className="p-2.5 rounded-full hover:bg-muted transition-colors relative"
               aria-label="Cart"
             >
-              <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
+              <ShoppingCart className="h-5 w-5" strokeWidth={1.5} />
               <span className="absolute top-1 right-1 bg-foreground text-background text-[10px] font-medium rounded-full h-4 w-4 flex items-center justify-center">
                 0
               </span>

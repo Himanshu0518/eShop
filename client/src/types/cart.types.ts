@@ -17,6 +17,6 @@ export interface AddToCartPayload {
 
 export interface CartResponse {
   success: boolean;
-  items: CartItem[];
-  totalPrice: number;
+  message: string;
+  data: CartItem[];
 }

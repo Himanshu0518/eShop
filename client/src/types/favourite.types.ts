@@ -7,3 +7,13 @@ export interface Favorite {
   createdAt: string;
   product: Product;
 }
+
+export interface FavoritePayload {
+  productId: number;
+}
+
+export interface FavoriteResponse {
+  success: boolean;
+  message: string;
+  data: Favorite[];
+}
