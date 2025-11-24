@@ -1,6 +1,6 @@
 import { prisma } from "../config/db"
 import {asyncHandler} from "../utils/utils"
-import { Request, Response } from "express"
+import { Request, Response, CookieOptions } from "express"
 import { hashPassword, comparePassword, createAuthToken } from "../utils/utils"
 const SignupUser = asyncHandler(async (req: Request, res: Response) => {
 
@@ -65,11 +65,11 @@ const LoginUser = asyncHandler(async (req: Request, res: Response) => {
         }
        const accessToken = createAuthToken(String(existingUser.id));
         
-          const options = {
+          const options: CookieOptions = {
             httpOnly: true,
             secure: true,
-             
-            };
+            sameSite: "none",
+          };
 
     const user_db = await prisma.user.findUnique({
         where: { email: email },
