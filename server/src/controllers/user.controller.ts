@@ -68,7 +68,7 @@ const LoginUser = asyncHandler(async (req: Request, res: Response) => {
           const options: CookieOptions = {
             httpOnly: true,
             secure: true,
-          //  sameSite: "none",
+           sameSite: "none",
           };
 
     const user_db = await prisma.user.findUnique({
