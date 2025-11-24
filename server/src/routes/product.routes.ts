@@ -18,9 +18,13 @@ router.route('/update/:id')
 router.route('/delete/:productId').delete(VerifyJWT, deleteProduct);
 
 router.route('/add')
-.post(VerifyJWT, 
-     upload.single('img'),  
-    ValidateProductAddition,
-    addProduct);
+.post(
+  VerifyJWT, 
+  upload.single('img'),  
+  ValidateProductAddition,
+  addProduct
+);
+
+
 
 export default router;

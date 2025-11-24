@@ -8,7 +8,12 @@ const addProduct = asyncHandler(async (req: Request, res: Response) => {
      console.log("Request Body:", req.body);
 
      let imgLocalpath = req.file?.path;
-     console.log("File path:", imgLocalpath);
+    if(!imgLocalpath){
+        return res.status(400).json({
+            success:false,
+            message:"Image is required"
+        })
+    }
      try{
          const uploadResult = await uploadToCloudinary(imgLocalpath!);
         
