@@ -10,6 +10,7 @@ import Women from "@/pages/Women";
 import Kids from "@/pages/Kids";
 import Accessories from "@/pages/Accessories";
 import NewArrivals from "@/pages/NewArrivals";
+import Product from "./Product";
 
 export {  
   Home,
@@ -23,5 +24,6 @@ export {
     Women,
     Kids,
     Accessories,
-    NewArrivals
+    NewArrivals,
+    Product
 };

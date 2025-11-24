@@ -14,6 +14,7 @@ import {
   Kids,
   Accessories,
   NewArrivals,
+  Product
 } from "@/pages";
 
 const router = createBrowserRouter([
@@ -38,6 +39,7 @@ const router = createBrowserRouter([
             path: "orders",
             element: <Orders />,
           },
+
         ],
       },
 
@@ -69,6 +71,10 @@ const router = createBrowserRouter([
       {
         path: "new-arrivals",
         element: <NewArrivals />,
+      },
+       {
+        path: "product/:productId",
+        element: <Product />,
       },
     ],
   },
