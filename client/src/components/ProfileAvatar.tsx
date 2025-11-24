@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 
 function ProfileAvatar() {
   const { data: user } = useCurrentUserQuery();
-const [logOut, { isLoading }] = useLogOutMutation();
+const [logOut] = useLogOutMutation();
 const navigate = useNavigate();
 
 const handleLogout = async () => {

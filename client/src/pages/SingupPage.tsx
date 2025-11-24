@@ -104,7 +104,7 @@ function SignupPage() {
                 />
                 {error && (error as ApiError)?.data?.errors?.name && (
                   <p className="text-xs text-destructive">
-                    {(error as ApiError).data.errors.name}
+                    {(error as ApiError).data.errors?.name}
                   </p>
                 )}
               </div>
@@ -126,7 +126,7 @@ function SignupPage() {
                 />
                 {error && (error as ApiError)?.data?.errors?.email && (
                   <p className="text-xs text-destructive">
-                    {(error as ApiError).data.errors.email}
+                    {(error as ApiError)?.data.errors?.email}
                   </p>
                 )}
               </div>
@@ -148,7 +148,7 @@ function SignupPage() {
                 />
                 {error && (error as ApiError)?.data?.errors?.password && (
                   <p className="text-xs text-destructive">
-                    {(error as ApiError).data.errors.password}
+                    {(error as ApiError)?.data.errors?.password}
                   </p>
                 )}
               </div>
@@ -170,7 +170,7 @@ function SignupPage() {
                 />
                 {error && (error as ApiError)?.data?.errors?.confirmPassword && (
                   <p className="text-xs text-destructive">
-                    {(error as ApiError).data.errors.confirmPassword}
+                    {(error as ApiError)?.data.errors?.confirmPassword}
                   </p>
                 )}
               </div>

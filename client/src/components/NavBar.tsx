@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Search, ShoppingCart, Heart, Menu, X } from "lucide-react";
+import { Search, ShoppingCart, Heart, Menu } from "lucide-react";
 import ProfileAvatar from "./ProfileAvatar";
 import {
   Sheet,
