@@ -7,9 +7,7 @@ import "dotenv/config";
 
 const app: Application = express();
 
-
-const port = process.env.PORT ;
-
+const port = process.env.PORT || 8000;
 
 // middlewares 
 // FIRST: Body parsers
@@ -19,23 +17,29 @@ app.use(express.urlencoded({ extended: false }));
 // SECOND: Cookie
 app.use(cookieParser());
 
-// THIRD: CORS
+// THIRD: CORS - FIXED for deployment
+const allowedOrigins = [
+  'http://localhost:5173',
+  process.env.CLIENT_URL, // Your deployed frontend URL
+].filter(Boolean); // Remove undefined values
+
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: allowedOrigins,
   credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods:['*']
 }));
 
 // FOURTH: Other middlewares
 app.use(express.static("public"));
 app.use(morgan("dev"));
-app.use(helmet());
-
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
 app.get('/', (_: Request, res: Response) => {
-   
-    res.status(200).json({ message: 'Server is running' });
+   res.status(200).json({ message: 'Server is running' });
 });
-
 
 // all routes will be here
 import userRoutes from './routes/user.routes';
@@ -50,4 +54,5 @@ app.use('/api/users', userRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+   
 });

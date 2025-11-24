@@ -6,7 +6,10 @@
     "outDir": "dist",
     "lib": ["ES2020"],
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "@prisma/client": ["./node_modules/.pnpm/@prisma+client@7.0.0_prisma*/node_modules/@prisma/client"]
+    }
   },
-  "include": ["src","src/types/**/*"],
+  "include": ["src", "src/types/**/*"]
 }
