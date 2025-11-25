@@ -1,35 +1,29 @@
 import { Link } from "react-router-dom";
-import { Instagram, Facebook, Twitter, Youtube } from "lucide-react";
 
+import {FaInstagram, FaFacebook, FaTwitter, FaYoutube} from 'react-icons/fa'
 const footerLinks = {
   shop: [
     { name: "Women", href: "/category/women" },
     { name: "Men", href: "/category/men" },
     { name: "Kids", href: "/category/kids" },
     { name: "Accessories", href: "/category/accessories" },
-    { name: "Sale", href: "/sale" },
   ],
   help: [
     { name: "Customer Service", href: "/help" },
     { name: "Track Order", href: "/orders" },
-    { name: "Returns & Exchanges", href: "/returns" },
-    { name: "Shipping Info", href: "/shipping" },
-    { name: "FAQs", href: "/faqs" },
+  
   ],
   company: [
     { name: "About Us", href: "/about" },
-    { name: "Careers", href: "/careers" },
-    { name: "Press", href: "/press" },
-    { name: "Sustainability", href: "/sustainability" },
     { name: "Contact", href: "/contact" },
   ],
 };
 
 const socialLinks = [
-  { name: "Instagram", icon: Instagram, href: "#" },
-  { name: "Facebook", icon: Facebook, href: "#" },
-  { name: "Twitter", icon: Twitter, href: "#" },
-  { name: "Youtube", icon: Youtube, href: "#" },
+  { name: "Instagram", icon: FaInstagram, href: "#" },
+  { name: "Facebook", icon: FaFacebook, href: "#" },
+  { name: "Twitter", icon: FaTwitter, href: "#" },
+  { name: "Youtube", icon: FaYoutube, href: "#" },
 ];
 
 export default function Footer() {

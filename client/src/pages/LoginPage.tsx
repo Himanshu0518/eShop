@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState, useEffect, type FormEvent, type ChangeEvent } from "react";
+import { useState, type FormEvent, type ChangeEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/services/user.services";
 import Spinner from "@/components/Spinner";
@@ -15,21 +15,19 @@ function LoginPage() {
     password: "",
   });
 
-  const [login, { error, isLoading, isSuccess }] = useLoginMutation();
+  const [login, { error, isLoading }] = useLoginMutation();
 
-  useEffect(() => {
-    if (isSuccess) {
-      navigate("/");
-      toast.success("You are logged in successfully!");
-    }
-  }, [isSuccess, navigate]);
+ 
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
+       toast.success("You are logged in successfully!");
       await login(formData).unwrap();
+      navigate("/", { replace: true });
     } catch (err) {
       console.error("Login failed:", err);
+
     }
   };
 

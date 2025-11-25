@@ -9,7 +9,7 @@ export default function Accessories() {
   // Filter only accessories's products
   const ancessoriesProducts =
   products?.data?.filter((product) =>
-    product.category.some((c) => c.toLowerCase() === "kids")
+    product.category.some((c) => c.toLowerCase() === "accessories")
   ) || [];
 
 

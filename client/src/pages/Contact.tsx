@@ -187,10 +187,7 @@ function Contact() {
               ))}
             </div>
 
-            {/* Map placeholder */}
-            <div className="mt-12 aspect-video bg-muted flex items-center justify-center">
-              <p className="text-muted-foreground text-sm">Map coming soon</p>
-            </div>
+            
           </div>
         </div>
       </div>

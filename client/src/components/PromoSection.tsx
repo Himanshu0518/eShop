@@ -1,5 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+
 
 export default function PromoSection() {
   return (
@@ -22,13 +21,7 @@ export default function PromoSection() {
                 Summer Sale
                 <span className="block font-normal">Up to 50% Off</span>
               </h3>
-              <Button
-                variant="outline"
-                className="w-fit border-white text-white hover:bg-white hover:text-black rounded-none px-6 py-5 text-sm tracking-wider bg-transparent transition-all duration-300 group/btn"
-              >
-                Shop Sale
-                <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-              </Button>
+            
             </div>
           </div>
 
@@ -48,13 +41,7 @@ export default function PromoSection() {
                 Fall Collection
                 <span className="block font-normal">Now Available</span>
               </h3>
-              <Button
-                variant="outline"
-                className="w-fit border-white text-white hover:bg-white hover:text-black rounded-none px-6 py-5 text-sm tracking-wider bg-transparent transition-all duration-300 group/btn"
-              >
-                Discover
-                <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-              </Button>
+             
             </div>
           </div>
         </div>

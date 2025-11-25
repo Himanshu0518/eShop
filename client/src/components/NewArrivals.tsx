@@ -115,7 +115,7 @@ export default function NewArrivals() {
 
         {/* Products Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-          {isSuccess && products.data.map((product) => (
+          {isSuccess && products.data.slice(0, 4).map((product) => (
             <div key={product.id} className="group relative">
               <Link to={`/product/${product.id}`} className="block">
                 <div className="space-y-4">

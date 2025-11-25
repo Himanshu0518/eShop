@@ -6,13 +6,14 @@ import Footer from "@/components/Footer";
 function RootLayout() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
+       <Toaster position="top-right" richColors />
+       
       <NavBar />
       <main className="grow">
         <Outlet />
       </main>
        <Footer />
 
-      <Toaster position="top-right" richColors />
     </div>
   );
 }

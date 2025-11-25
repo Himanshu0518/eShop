@@ -12,6 +12,7 @@ import { useCurrentUserQuery } from "@/services/user.services";
 import { Link } from "react-router";
 import { useLogOutMutation } from "@/services/user.services";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 function ProfileAvatar() {
   const { data: user } = useCurrentUserQuery();
@@ -20,7 +21,8 @@ const navigate = useNavigate();
 
 const handleLogout = async () => {
   try {
-    await logOut().unwrap();
+     toast.success("You are logged out successfully!");
+    await logOut().unwrap(); 
     navigate("/login", { replace: true });
   } catch (error) {
     console.error("Logout failed:", error);

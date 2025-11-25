@@ -27,7 +27,8 @@ app.use(cors({
   origin: allowedOrigins,
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
-  methods:['*']
+ methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
+
 }));
 
 // FOURTH: Other middlewares
