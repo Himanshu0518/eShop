@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { getAllProducts,updateProduct, deleteProduct, addProduct, getProductById} from "../controllers/product.controller";
+import { getAllProducts,updateProduct, deleteProduct, addProduct, getProductById, addProductView,getProductViews} from "../controllers/product.controller";
 import { VerifyJWT } from "../middlewares/authMiddleware";
 import { upload } from "../middlewares/multerMiddleware";
 import { ValidateProductAddition } from "../middlewares/Validation";
+
 const router = Router();
 
 // Define product routes here
@@ -25,6 +26,7 @@ router.route('/add')
   addProduct
 );
 
-
+router.route('/addView/:productId').post(VerifyJWT,addProductView);
+router.route('/getViews').get(VerifyJWT,getProductViews);
 
 export default router;

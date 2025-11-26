@@ -26,6 +26,7 @@ model User {
   orders    Order[]
   cartItems CartItem[]
   favorites favorite[]
+  ProductViews  ProductView[] 
 }
 
 model Product {
@@ -43,6 +44,7 @@ model Product {
   //  relations
   cartItems   CartItem[]
   favorites   favorite[]
+  ProductViews ProductView[]
 }
 
 model Order {
@@ -79,3 +81,19 @@ model favorite {
   product   Product  @relation(fields: [productId], references: [id])
 }
 
+model ProductView {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  productId Int
+  viewedAt  DateTime  @default(now())
+
+  user      User?     @relation(fields: [userId], references: [id])
+  product   Product   @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
+  @@index([viewedAt])
+
+
+}

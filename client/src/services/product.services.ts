@@ -3,14 +3,15 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type {
   Product,
   ProductListResponse,
-  ProductDetailResponse
+  ProductDetailResponse,
+  ProductViewResponse
 } from '@/types/product.types';
 
 
 export const productApi = createApi({
   reducerPath: 'productApi',
 
-  tagTypes: [ "Product"],
+  tagTypes: [ "Product", "ProductView" ],
 
   baseQuery: fetchBaseQuery({
     baseUrl: `${import.meta.env.VITE_CLIENT_BASE_URL}/api`,
@@ -57,13 +58,28 @@ export const productApi = createApi({
       ],
     }),
 
+  addView: builder.mutation<ProductViewResponse, number>({
+  query: (id) => ({
+    url: `/products/addView/${id}`,
+    method: "POST"
+  }),
+  invalidatesTags: ["ProductView"]
+}),
+
+getViews: builder.query<ProductViewResponse, void>({
+  query: () => "/products/getViews",
+  providesTags: ["ProductView"]
+})
+
   }),
 });
 
 
 export const {
-    useGetProductsQuery,
-    useGetProductQuery,
-    useCreateProductMutation,
-    useUpdateProductMutation
+  useGetProductsQuery,
+  useGetProductQuery,
+  useCreateProductMutation,
+  useUpdateProductMutation,
+  useAddViewMutation,
+  useGetViewsQuery
 } = productApi;

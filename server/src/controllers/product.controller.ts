@@ -44,7 +44,13 @@ const addProduct = asyncHandler(async (req: Request, res: Response) => {
 
 const getAllProducts = asyncHandler(async (_: Request, res: Response) => {
     try{
-        const products =  await prisma.product.findMany();
+        const products =  await prisma.product.findMany(
+            {
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            }
+        );
         return res.status(200).json({
             success:true,
             message:"Products fetched successfully",
@@ -162,10 +168,88 @@ const deleteProduct = asyncHandler(async (req: Request, res: Response) => {
     }
 });
 
+const addProductView = asyncHandler(async (req: Request, res: Response) => {
+    const {productId} = req.params;
+    const userId = req.user.id;
+
+  
+    try{
+
+        const existingProductView = await prisma.productView.findUnique({
+            where:{
+                userId_productId:{
+                    userId:userId,
+                    productId:Number(productId)
+                }
+            }
+        })
+
+        if(existingProductView){
+             return res.status(200).json({
+            success:true,
+            message:"Product view added successfully",
+            data:existingProductView
+        })
+        }
+        const productView = await prisma.productView.create({
+            data:{
+                productId:Number(productId),
+                userId:Number(userId)
+            }
+        });
+        return res.status(200).json({
+            success:true,
+            message:"Product view added successfully",
+            data:productView
+        })
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:`Unable to add product view: ${(error as Error).message}`,
+        })
+    }
+    
+})
+
+
+const getProductViews = asyncHandler(async (req: Request, res: Response) => {
+    try{
+        const productViews = await prisma.productView.findMany(
+            {
+                include:{
+                    product:true
+                },
+                orderBy: {
+                    viewedAt: 'desc'
+                },
+                where: {
+                    userId: req.user.id
+                }
+                
+            }
+           
+        );
+        return res.status(200).json({
+            success:true,
+            message:"Product views fetched successfully",
+            data:productViews
+        })
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:`Unable to fetch product views: ${(error as Error).message}`,
+        })
+    }
+    
+})
+
 export {
     addProduct,
     getAllProducts,
     getProductById,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    addProductView,
+    getProductViews
+
 };

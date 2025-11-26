@@ -2,12 +2,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useGetProductQuery } from "@/services/product.services";
 import { useAddToCartMutation } from "@/services/cart.services";
 import { useToggleFavouriteMutation } from "@/services/favourites.services";
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import { Heart, ShoppingCart, ArrowLeft, Check } from "lucide-react";
 import Spinner from "@/components/Spinner";
+import { useAddViewMutation } from "@/services/product.services";
 
 function Product() {
   const { productId } = useParams();
+  
   console.log("Product ID:", productId);
   const navigate = useNavigate();
   const { data: product, isLoading, isError, isSuccess } = useGetProductQuery(Number(productId));
@@ -17,6 +19,11 @@ function Product() {
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+ const [addView] = useAddViewMutation();
+
+  useEffect(() => {
+    addView(Number(productId));
+  }, [productId, addView]);
 
   const handleAddToCart = async () => {
     try {

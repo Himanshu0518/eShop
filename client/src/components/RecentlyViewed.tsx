@@ -1,17 +1,12 @@
-import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useGetProductsQuery } from "@/services/product.services";
-
+// import { ArrowRight } from "lucide-react";
+import { useGetViewsQuery } from "@/services/product.services";
 import Spinner from "./Spinner";
-import ProductCard from "./ProductCard";  
+import ProductCard from "./ProductCard";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 
-export default function NewArrivals() {
-  const { data: products, error, isLoading, isSuccess } = useGetProductsQuery();
-
-
-
-
+export default function RecentlyViewed() {
+  const { data: recentProducts, error, isLoading, isSuccess } = useGetViewsQuery();
 
   return (
     <section className="py-20 md:py-32 px-6 md:px-16 lg:px-24 bg-muted/30">
@@ -19,20 +14,12 @@ export default function NewArrivals() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-4">
           <div>
-            <span className="text-muted-foreground text-xs tracking-[0.3em] uppercase">
-              Just In
-            </span>
+           
             <h2 className="mt-4 text-3xl md:text-4xl lg:text-5xl font-extralight tracking-tight">
-              New Arrivals
+              Recently Viewed
             </h2>
           </div>
-          <Link
-            to="/new-arrivals"
-            className="group flex items-center gap-2 text-sm tracking-wider hover:gap-3 transition-all duration-300"
-          >
-            View All
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+        
         </div>
 
         {/* Loading State */}
@@ -40,11 +27,13 @@ export default function NewArrivals() {
           <div className="flex items-center justify-center py-20">
             <div className="text-center space-y-4">
               <Spinner />
-              <p className="text-sm text-muted-foreground tracking-wider">Loading new arrivals...</p>
+              <p className="text-sm text-muted-foreground tracking-wider">
+                please wait ...
+              </p>
             </div>
           </div>
         )}
-        
+
         {/* Error State */}
         {error && (
           <div className="flex items-center justify-center py-20">
@@ -65,27 +54,29 @@ export default function NewArrivals() {
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-medium mb-2">Unable to load products</h3>
-                <p className="text-sm text-muted-foreground">{(error as Error).message}</p>
+                <h3 className="text-lg font-medium mb-2">
+                  Unable to load products
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {(error as Error).message}
+                </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-          {isSuccess && products.data.slice(0, 4).map((product) => (
-
-            <ProductCard
-              key={product.id}
-              product={product}
-            
-            />
-
-
-
-          ))}
+        {/* Products scroll area */}
+  
+  <ScrollArea>
+     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+          {isSuccess &&
+            recentProducts.data.map((views) => (
+                <ProductCard key={views.id} product={views.product} />
+              ))}
         </div>
+  </ScrollArea>
+
+       
       </div>
     </section>
   );
