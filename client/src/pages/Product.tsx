@@ -1,28 +1,59 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useGetProductQuery } from "@/services/product.services";
+import { useGetProductsQuery, useGetProductQuery, useGetRecommendedByProductQuery } from "@/services/product.services";
 import { useAddToCartMutation } from "@/services/cart.services";
 import { useToggleFavouriteMutation } from "@/services/favourites.services";
-import { useState , useEffect} from "react";
+import { useState, useEffect } from "react";
 import { Heart, ShoppingCart, ArrowLeft, Check } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { useAddViewMutation } from "@/services/product.services";
+import ProductCard from "@/components/ProductCard";
 
 function Product() {
   const { productId } = useParams();
-  
-  console.log("Product ID:", productId);
   const navigate = useNavigate();
-  const { data: product, isLoading, isError, isSuccess } = useGetProductQuery(Number(productId));
-  const [addToCart, { isLoading: isAddingToCart }] = useAddToCartMutation();
+
+  // Fetch all products first
+  const { data: allProducts, isLoading: isLoadingProducts } = useGetProductsQuery();
   
+  // Try to find product from cache
+  const cachedProduct = allProducts?.data?.find(p => p.id === Number(productId));
+  
+  const calculateNetPrice = (price: number, discount: number) => {
+    return price - (price * discount) / 100;
+  };
+
+  // Only fetch if not in the list cache
+  const { data: detailedProduct, isLoading: isLoadingDetail } = useGetProductQuery(
+    Number(productId),
+    {
+      skip: !!cachedProduct
+    }
+  );
+  
+  // Combine both sources
+  const product = cachedProduct || detailedProduct?.data;
+  
+  const { data: recommendedData, isLoading: isLoadingRecommended } = useGetRecommendedByProductQuery(Number(productId));
+  const recommendedProducts = recommendedData?.data;
+
+  // Determine overall loading state
+  const isLoading = isLoadingProducts || isLoadingDetail;
+  
+  // Determine if product exists
+  const hasProduct = !!product;
+
+  const [addToCart, { isLoading: isAddingToCart }] = useAddToCartMutation();
   const [toggleFavorite] = useToggleFavouriteMutation();
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
- const [addView] = useAddViewMutation();
+  const [addView] = useAddViewMutation();
 
+  // Track view when product ID changes
   useEffect(() => {
-    addView(Number(productId));
+    if (productId) {
+      addView(Number(productId));
+    }
   }, [productId, addView]);
 
   const handleAddToCart = async () => {
@@ -61,8 +92,8 @@ function Product() {
     );
   }
 
-  // Error State
-  if (isError || !isSuccess) {
+  // Product Not Found State
+  if (!hasProduct) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="max-w-md text-center">
@@ -94,8 +125,7 @@ function Product() {
     );
   }
 
-  const productData = product?.data;
-
+  // Product Found - Render
   return (
     <div className="min-h-screen bg-white">
       {/* Back Button */}
@@ -115,8 +145,8 @@ function Product() {
           <div>
             <div className="aspect-3/4 overflow-hidden bg-gray-50 mb-6">
               <img
-                src={productData?.img}
-                alt={productData?.name}
+                src={product?.img}
+                alt={product?.name}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -127,22 +157,39 @@ function Product() {
             {/* Header */}
             <div>
               <p className="text-xs font-light text-gray-500 tracking-widest uppercase mb-3">
-                {productData?.category}
+                {product?.category}
               </p>
               <h1 className="text-4xl md:text-5xl font-light text-black mb-6 leading-tight">
-                {productData?.name}
+                {product?.name}
               </h1>
               <div className="h-px w-12 bg-black mb-6"></div>
-              <p className="text-3xl font-light text-black">
-                ${productData?.price?.toFixed(2)}
-              </p>
+
+              <div className="flex items-baseline gap-3">
+                {product?.discount > 0 ? (
+                  <>
+                    <p className="text-3xl font-light text-black">
+                      ${calculateNetPrice(product?.price, product?.discount).toFixed(2)}
+                    </p>
+                    <p className="text-xl font-light text-gray-400 line-through">
+                      ${product?.price?.toFixed(2)}
+                    </p>
+                    <span className="text-sm font-light text-red-600 tracking-wider">
+                      {product?.discount}% OFF
+                    </span>
+                  </>
+                ) : (
+                  <p className="text-3xl font-light text-black">
+                    ${product?.price?.toFixed(2)}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Description */}
-            {productData?.description && (
+            {product?.description && (
               <div>
                 <p className="text-sm font-light text-gray-700 leading-relaxed">
-                  {productData.description}
+                  {product.description}
                 </p>
               </div>
             )}
@@ -155,7 +202,7 @@ function Product() {
               <div className="flex items-center gap-4 border border-gray-300 w-fit">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-12 h-12 flex items-center justify-center text-gray-600 hover:text-black transition-colors"
+                  className="w-12 h-12 flex items-center justify-center text-gray-600 hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={quantity === 1}
                 >
                   −
@@ -199,7 +246,6 @@ function Product() {
 
               <button
                 onClick={handleToggleFavorite}
-                
                 className="w-full h-12 border border-gray-300 hover:border-black text-black rounded-none text-xs font-light tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70"
               >
                 <Heart
@@ -223,18 +269,33 @@ function Product() {
                   <li>• Ships within 1-2 business days</li>
                 </ul>
               </div>
-
-              <div>
-                <h3 className="text-xs font-light text-black tracking-widest uppercase mb-2">
-                  Care Instructions
-                </h3>
-                <p className="text-xs font-light text-gray-600">
-                  Machine wash cold with similar colors. Do not bleach. Hang dry.
-                </p>
-              </div>
             </div>
           </div>
         </div>
+
+        {/* Recommended Products Section */}
+        {recommendedProducts && recommendedProducts.length > 0 && (
+          <div className="mt-24 pt-16 border-t border-gray-200">
+            <div className="mb-12">
+              <h2 className="text-2xl md:text-3xl font-light text-black mb-3">
+                You Might Also Like
+              </h2>
+              <div className="h-px w-16 bg-black"></div>
+            </div>
+
+            {isLoadingRecommended ? (
+              <div className="flex items-center justify-center py-12">
+                <Spinner />
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
+                {recommendedProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

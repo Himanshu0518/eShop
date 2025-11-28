@@ -8,7 +8,7 @@ export default function NewArrivals() {
   const { data: products, error, isLoading, isSuccess } = useGetProductsQuery();
 
   return (
-    <section className="py-20 md:py-32 px-6 md:px-16 lg:px-24 bg-muted/30">
+    <section className="py-18 md:py-30 px-6 md:px-16 lg:px-24 bg-muted/30">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-4">

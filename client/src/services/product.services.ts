@@ -11,7 +11,7 @@ import type {
 export const productApi = createApi({
   reducerPath: 'productApi',
 
-  tagTypes: [ "Product", "ProductView" ],
+  tagTypes: ["Product", "ProductView"],
 
   baseQuery: fetchBaseQuery({
     baseUrl: `${import.meta.env.VITE_CLIENT_BASE_URL}/api`,
@@ -36,7 +36,13 @@ export const productApi = createApi({
       providesTags: (_, __, id) => [{ type: "Product", id }],
     }),
 
-    // ADMIN: Create or update product
+    // Get recommended products by product ID
+    getRecommendedByProduct: builder.query<ProductListResponse, number>({
+      query: (id) => `/products/getrecommendations/${id}`,
+      providesTags: ["Product"]
+    }),
+
+    // ADMIN: Create product
     createProduct: builder.mutation<Product, Partial<Product>>({
       query: (body) => ({
         url: "/products/add",
@@ -46,6 +52,7 @@ export const productApi = createApi({
       invalidatesTags: ["Product"]
     }),
 
+    // ADMIN: Update product
     updateProduct: builder.mutation<Product, { id: number; data: Partial<Product> }>({
       query: ({ id, data }) => ({
         url: `/products/update/${id}`,
@@ -58,18 +65,20 @@ export const productApi = createApi({
       ],
     }),
 
-  addView: builder.mutation<ProductViewResponse, number>({
-  query: (id) => ({
-    url: `/products/addView/${id}`,
-    method: "POST"
-  }),
-  invalidatesTags: ["ProductView"]
-}),
+    // Add product view
+    addView: builder.mutation<ProductViewResponse, number>({
+      query: (id) => ({
+        url: `/products/addView/${id}`,
+        method: "POST"
+      }),
+      invalidatesTags: ["ProductView"]
+    }),
 
-getViews: builder.query<ProductViewResponse, void>({
-  query: () => "/products/getViews",
-  providesTags: ["ProductView"]
-})
+    // Get all views
+    getViews: builder.query<ProductViewResponse, void>({
+      query: () => "/products/getViews",
+      providesTags: ["ProductView"]
+    })
 
   }),
 });
@@ -78,6 +87,7 @@ getViews: builder.query<ProductViewResponse, void>({
 export const {
   useGetProductsQuery,
   useGetProductQuery,
+  useGetRecommendedByProductQuery,
   useCreateProductMutation,
   useUpdateProductMutation,
   useAddViewMutation,

@@ -14,7 +14,7 @@ export default function Women() {
 
 
   return (
-    <section className="py-20 md:py-32 px-4 sm:px-8 lg:px-16 bg-white">
+    <section className="py-18 md:py-30 px-4 sm:px-8 lg:px-16 bg-white">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="mb-16 md:mb-20">

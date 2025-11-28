@@ -27,7 +27,7 @@ const categories = [
 
 export default function FeaturedCategories() {
   return (
-    <section className="py-20 md:py-32 px-6 md:px-16 lg:px-24">
+    <section className="py-18 md:py-30 px-6 md:px-16 lg:px-24">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -44,7 +44,7 @@ export default function FeaturedCategories() {
           {categories.map((category) => (
             <Link to={category.href} key={category.name}>
               <Card className="group relative overflow-hidden border-0 rounded-none cursor-pointer bg-transparent">
-                <div className="aspect-[3/4] overflow-hidden">
+                <div className="aspect-3/4 overflow-hidden">
                   <img
                     src={category.image}
                     alt={category.name}
@@ -66,7 +66,7 @@ export default function FeaturedCategories() {
                 </div>
 
                 {/* Bottom gradient */}
-                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-linear-to-t from-black/60 to-transparent" />
               </Card>
             </Link>
           ))}
