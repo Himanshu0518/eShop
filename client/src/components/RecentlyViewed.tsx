@@ -1,82 +1,131 @@
-// import { ArrowRight } from "lucide-react";
 import { useGetViewsQuery } from "@/services/product.services";
+import { useSelector } from "react-redux";
 import Spinner from "./Spinner";
 import ProductCard from "./ProductCard";
-import { ScrollArea } from "@/components/ui/scroll-area";
-
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRef } from "react";
+import { Button } from "./ui/button";
 
 export default function RecentlyViewed() {
-  const { data: recentProducts, error, isLoading, isSuccess } = useGetViewsQuery();
+  const authStatus  = useSelector((state: any) => state.auth.status);
+  
+  
+  const { data: recentProducts, error, isLoading, isSuccess } = useGetViewsQuery(undefined, {
+    skip: !authStatus,
+  });
+  
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  return (
-    <section className="py-20 md:py-32 px-6 md:px-16 lg:px-24 bg-muted/30">
-      <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-4">
-          <div>
-           
-            <h2 className="mt-4 text-3xl md:text-4xl lg:text-5xl font-extralight tracking-tight">
-              Recently Viewed
-            </h2>
-          </div>
-        
-        </div>
+  const scroll = (direction: "left" | "right") => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 400;
+      const newScrollPosition = 
+        scrollContainerRef.current.scrollLeft + 
+        (direction === "left" ? -scrollAmount : scrollAmount);
+      
+      scrollContainerRef.current.scrollTo({
+        left: newScrollPosition,
+        behavior: "smooth"
+      });
+    }
+  };
 
-        {/* Loading State */}
-        {isLoading && (
+  if (!authStatus) {
+    return null;
+  }
+
+  if (isLoading) {
+    return (
+      <section className="py-20 md:py-32 px-6 md:px-16 lg:px-24 bg-background">
+        <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center py-20">
             <div className="text-center space-y-4">
               <Spinner />
               <p className="text-sm text-muted-foreground tracking-wider">
-                please wait ...
+                Loading recently viewed...
               </p>
             </div>
           </div>
-        )}
+        </div>
+      </section>
+    );
+  }
 
-        {/* Error State */}
-        {error && (
-          <div className="flex items-center justify-center py-20">
-            <div className="max-w-md text-center space-y-4 px-6">
-              <div className="w-12 h-12 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-destructive"
-                  fill="none"
-                  strokeWidth="2"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+  if (error || !isSuccess || !recentProducts?.data || recentProducts.data.length === 0) {
+    return null;
+  }
+
+  const itemCount = recentProducts.data.length;
+  const shouldScroll = itemCount > 4;
+
+  return (
+    <section className="py-20 md:py-32 px-6 md:px-16 lg:px-24 bg-background">
+      <div className="max-w-7xl mx-auto">
+        {/* Section Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <span className="text-muted-foreground text-xs tracking-[0.3em] uppercase">
+              Your History
+            </span>
+            <h2 className="mt-2 text-3xl md:text-4xl lg:text-5xl font-extralight tracking-tight">
+              Recently Viewed
+            </h2>
+          </div>
+
+          {/* Scroll Buttons - Only show if more than 4 items */}
+          {shouldScroll && (
+            <div className="hidden md:flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full h-10 w-10 border-border hover:bg-accent"
+                onClick={() => scroll("left")}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full h-10 w-10 border-border hover:bg-accent"
+                onClick={() => scroll("right")}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Conditional Layout Based on Item Count */}
+        {shouldScroll ? (
+          /* Horizontal Scroll for 5+ items */
+          <div className="relative">
+            <div
+              ref={scrollContainerRef}
+              className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
+            >
+              {recentProducts.data.map((view) => (
+                <div
+                  key={view.id}
+                  className="flex-shrink-0 w-[180px] sm:w-[220px] md:w-[260px]"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-lg font-medium mb-2">
-                  Unable to load products
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {(error as Error).message}
-                </p>
-              </div>
+                  <ProductCard product={view.product} />
+                </div>
+              ))}
+            </div>
+
+            {/* Mobile Scroll Indicator */}
+            <div className="md:hidden text-center mt-4">
+              <p className="text-xs text-muted-foreground">← Swipe to see more →</p>
             </div>
           </div>
+        ) : (
+          /* Grid Layout for 1-4 items - Equal width spacing */
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
+            {recentProducts.data.map((view) => (
+              <ProductCard key={view.id} product={view.product} />
+            ))}
+          </div>
         )}
-
-        {/* Products scroll area */}
-  
-  <ScrollArea>
-     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-          {isSuccess &&
-            recentProducts.data.map((views) => (
-                <ProductCard key={views.id} product={views.product} />
-              ))}
-        </div>
-  </ScrollArea>
-
-       
       </div>
     </section>
   );

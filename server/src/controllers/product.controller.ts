@@ -1,12 +1,11 @@
 import { uploadToCloudinary,asyncHandler,NormalizeString } from "../utils/utils";
 import {prisma} from "../config/db";
 import { Request, Response } from "express";
-
+import { getEmbeddings } from "../utils/embeddings";
 const addProduct = asyncHandler(async (req: Request, res: Response) => {
 
      const { name, description, price, category,sizes, discount } = req.body;
-     console.log("Request Body:", req.body);
-
+    
      let imgLocalpath = req.file?.path;
     if(!imgLocalpath){
         return res.status(400).json({
@@ -16,8 +15,9 @@ const addProduct = asyncHandler(async (req: Request, res: Response) => {
     }
      try{
          const uploadResult = await uploadToCloudinary(imgLocalpath!);
+         // add word_embedding ---> description + category.join(' ) + name 
         
-         const newProduct = await prisma.product.create({
+            const newProduct = await prisma.product.create({
             data:{
                 name,
                 description,
@@ -29,10 +29,39 @@ const addProduct = asyncHandler(async (req: Request, res: Response) => {
             }
          })
 
+         const text=`${description} ${category} ${name}`
+         const embeddings = await getEmbeddings(text);
+      
+         
+         const embedding = embeddings[0]['values'];
+        console.log("dimensions ",embedding.length);
+       const vector = `[${embedding.join(",")}]`;
+
+// Insert/update embedding using raw SQL
+          await prisma.$executeRawUnsafe(
+    `INSERT INTO "ProductEmbedding" ("productId", "embedding", "createdAt", "updatedAt")
+    VALUES ($1, $2::vector, NOW(), NOW())
+    ON CONFLICT ("productId") 
+    DO UPDATE SET 
+        "embedding" = EXCLUDED.embedding,
+        "updatedAt" = NOW();`,
+    newProduct.id,
+    vector
+);
+
+
+
+         const wordEmbedding = await prisma.productEmbedding.findFirst({
+            where:{
+                productId:newProduct.id
+            }
+         })
+
+      
             return  res.status(201).json({
                 success:true,
                 message:"Product added successfully",
-                data:newProduct
+                data: {...newProduct , wordEmbedding}
             })
      }catch(error){
         return res.status(500).json({
@@ -243,6 +272,146 @@ const getProductViews = asyncHandler(async (req: Request, res: Response) => {
     
 })
 
+const addWordEmbedding = asyncHandler(async (req: Request, res: Response) => {
+    const {productId} = req.body;
+   
+
+    try{
+        const product = await prisma.product.findUnique({
+            where:{
+                id:parseInt(productId)
+            }
+        })
+
+        if(!product){
+            return res.status(404).json({
+                success:false,
+                message:"Product not found"
+            })
+        }
+      const text=`${product.description} ${product.category} ${product.name}`
+         const embeddings = await getEmbeddings(text);
+      
+     
+         const embedding = embeddings[0]['values'];
+        console.log("dimensions ",embedding.length);
+       const vector = `[${embedding.join(",")}]`;
+
+// Insert/update embedding using raw SQL
+     await prisma.$executeRawUnsafe(
+    `INSERT INTO "ProductEmbedding" ("productId", "embedding", "createdAt", "updatedAt")
+    VALUES ($1, $2::vector, NOW(), NOW())
+    ON CONFLICT ("productId") 
+    DO UPDATE SET 
+        "embedding" = EXCLUDED.embedding,
+        "updatedAt" = NOW();`,
+    product.id,
+    vector
+);
+
+
+
+      
+            return  res.status(201).json({
+                success:true,
+                message:"Product added successfully",
+                data: {...product , embeddings}
+            })
+}catch(error){
+    return res.status(500).json({
+        success:false,
+        message:`Unable to add word embedding: ${(error as Error).message}`,
+    })
+}
+
+})
+
+const bulkAddWordEmbeddings = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        // Fetch all products without embeddings
+        const products = await prisma.product.findMany({
+            where: {
+                embedding: null
+            }
+        });
+
+        if (products.length === 0) {
+            return res.status(200).json({
+                success: true,
+                message: "All products already have embeddings",
+                data: { processed: 0, total: 0 }
+            });
+        }
+
+        let successCount = 0;
+        let failedCount = 0;
+        const errors: any[] = [];
+
+        // Process products in batches to avoid overwhelming the API
+        const batchSize = 5; // Process 5 at a time
+        
+        for (let i = 0; i < products.length; i += batchSize) {
+            const batch = products.slice(i, i + batchSize);
+            
+            // Process batch concurrently
+            const batchPromises = batch.map(async (product) => {
+                try {
+                    const text = `${product.description} ${product.category} ${product.name}`;
+                    const embeddings = await getEmbeddings(text);
+                    const embedding = embeddings[0]['values'];
+                    const vector = `[${embedding.join(",")}]`;
+
+                    await prisma.$executeRawUnsafe(
+                        `INSERT INTO "ProductEmbedding" ("productId", "embedding", "createdAt", "updatedAt")
+                        VALUES ($1, $2::vector, NOW(), NOW())
+                        ON CONFLICT ("productId") 
+                        DO UPDATE SET 
+                            "embedding" = EXCLUDED.embedding,
+                            "updatedAt" = NOW();`,
+                        product.id,
+                        vector
+                    );
+
+                    successCount++;
+                    console.log(`✓ Processed product ${product.id}: ${product.name}`);
+                } catch (error) {
+                    failedCount++;
+                    errors.push({
+                        productId: product.id,
+                        productName: product.name,
+                        error: (error as Error).message
+                    });
+                    console.error(`✗ Failed product ${product.id}:`, (error as Error).message);
+                }
+            });
+
+            await Promise.all(batchPromises);
+            
+            // Optional: Add a small delay between batches to avoid rate limiting
+            if (i + batchSize < products.length) {
+                await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
+            }
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Bulk embedding generation completed",
+            data: {
+                total: products.length,
+                successful: successCount,
+                failed: failedCount,
+                errors: errors.length > 0 ? errors : undefined
+            }
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: `Unable to bulk add word embeddings: ${(error as Error).message}`,
+        });
+    }
+});
+
 export {
     addProduct,
     getAllProducts,
@@ -250,6 +419,7 @@ export {
     updateProduct,
     deleteProduct,
     addProductView,
-    getProductViews
-
+    getProductViews,
+    addWordEmbedding,
+     bulkAddWordEmbeddings 
 };

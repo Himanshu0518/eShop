@@ -6,7 +6,9 @@ import Features from "@/components/Features";
 import Newsletter from "@/components/Newsletter";
 import RecentlyViewed from "@/components/RecentlyViewed";
 
+
 function Home() {
+ 
   return (
     <>
       <Hero />

@@ -7,9 +7,12 @@ import { useLoginMutation } from "@/services/user.services";
 import Spinner from "@/components/Spinner";
 import type { ApiError } from "@/types/user.types";
 import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/store/authSlice";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -17,17 +20,20 @@ function LoginPage() {
 
   const [login, { error, isLoading }] = useLoginMutation();
 
- 
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-       toast.success("You are logged in successfully!");
-      await login(formData).unwrap();
+    const res =  await login(formData).unwrap();
+      toast.success("Welcome back!", {
+        description: "You have been logged in successfully",
+      });
+      dispatch(setUser(res));
       navigate("/", { replace: true });
-    } catch (err) {
+    } catch (err: any) {
       console.error("Login failed:", err);
-
+      toast.error("Login failed", {
+        description: err?.data?.message || "Please check your credentials and try again",
+      });
     }
   };
 
@@ -99,8 +105,10 @@ function LoginPage() {
                   type="email"
                   placeholder="you@example.com"
                   value={formData.email}
+                  
                   onChange={handleChange}
                   className="h-11 rounded-none border-border focus:border-foreground transition-colors"
+                  required
                 />
                 {error && (error as ApiError)?.data?.errors?.email && (
                   <p className="text-xs text-destructive">
@@ -123,6 +131,7 @@ function LoginPage() {
                   value={formData.password}
                   onChange={handleChange}
                   className="h-11 rounded-none border-border focus:border-foreground transition-colors"
+                  required
                 />
                 {error && (error as ApiError)?.data?.errors?.password && (
                   <p className="text-xs text-destructive">

@@ -132,12 +132,14 @@
   }
 
   /* Hide scrollbar but keep functionality */
-  .hide-scrollbar {
+  .hide-scrollbar,
+  .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
   
-  .hide-scrollbar::-webkit-scrollbar {
+  .hide-scrollbar::-webkit-scrollbar,
+  .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
 
@@ -166,6 +168,28 @@
     text-wrap: balance;
   }
 
+  /* Line clamp utilities */
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
   /* Aspect ratios */
   .aspect-portrait {
     aspect-ratio: 3/4;
@@ -173,6 +197,10 @@
 
   .aspect-landscape {
     aspect-ratio: 4/3;
+  }
+
+  .aspect-3\/4 {
+    aspect-ratio: 3/4;
   }
 
   /* Animation utilities */
@@ -209,6 +237,11 @@
 
   .img-zoom:hover img {
     transform: scale(1.05);
+  }
+
+  /* Backdrop blur utilities */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
   }
 }
 

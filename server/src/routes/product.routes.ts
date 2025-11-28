@@ -1,5 +1,13 @@
 import { Router } from "express";
-import { getAllProducts,updateProduct, deleteProduct, addProduct, getProductById, addProductView,getProductViews} from "../controllers/product.controller";
+import { getAllProducts,
+  updateProduct,
+  deleteProduct,
+  addProduct,
+  getProductById, 
+  bulkAddWordEmbeddings,
+  addProductView,
+  getProductViews,
+  addWordEmbedding} from "../controllers/product.controller";
 import { VerifyJWT } from "../middlewares/authMiddleware";
 import { upload } from "../middlewares/multerMiddleware";
 import { ValidateProductAddition } from "../middlewares/Validation";
@@ -16,7 +24,7 @@ router.route('/update/:id')
     upload.single('img'),
     updateProduct);
 
-router.route('/delete/:productId').delete(VerifyJWT, deleteProduct);
+router.route('/delete/:id').delete(VerifyJWT, deleteProduct);
 
 router.route('/add')
 .post(
@@ -29,4 +37,7 @@ router.route('/add')
 router.route('/addView/:productId').post(VerifyJWT,addProductView);
 router.route('/getViews').get(VerifyJWT,getProductViews);
 
+router.route('/addEmbedding').post(addWordEmbedding);
+
+router.route('/embeddings/bulk').post(bulkAddWordEmbeddings);
 export default router;

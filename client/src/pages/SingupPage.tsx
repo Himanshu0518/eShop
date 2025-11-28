@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState, useEffect, type FormEvent, type ChangeEvent } from "react";
+import { useState, type FormEvent, type ChangeEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSignUpMutation } from "@/services/user.services";
 import Spinner from "@/components/Spinner";
@@ -17,18 +17,31 @@ function SignupPage() {
     confirmPassword: "",
   });
 
-  const [signUp, { error, isLoading, isSuccess }] = useSignUpMutation();
-
-  useEffect(() => {
-    if (isSuccess) {
-      navigate("/");
-      toast.success("Account created successfully!");
-    }
-  }, [isSuccess, navigate]);
+  const [signUp, { error, isLoading }] = useSignUpMutation();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    await signUp(formData);
+    
+    // Client-side validation
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords don't match", {
+        description: "Please make sure both passwords are the same",
+      });
+      return;
+    }
+
+    try {
+      await signUp(formData).unwrap();
+      toast.success("Account created successfully!", {
+        description: "Welcome to eShop",
+      });
+      navigate("/", { replace: true });
+    } catch (err: any) {
+      console.error("Signup failed:", err);
+      toast.error("Failed to create account", {
+        description: err?.data?.message || "Please try again",
+      });
+    }
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -101,6 +114,7 @@ function SignupPage() {
                   value={formData.name}
                   onChange={handleChange}
                   className="h-11 rounded-none border-border focus:border-foreground transition-colors"
+                  required
                 />
                 {error && (error as ApiError)?.data?.errors?.name && (
                   <p className="text-xs text-destructive">
@@ -123,6 +137,7 @@ function SignupPage() {
                   value={formData.email}
                   onChange={handleChange}
                   className="h-11 rounded-none border-border focus:border-foreground transition-colors"
+                  required
                 />
                 {error && (error as ApiError)?.data?.errors?.email && (
                   <p className="text-xs text-destructive">
@@ -145,6 +160,7 @@ function SignupPage() {
                   value={formData.password}
                   onChange={handleChange}
                   className="h-11 rounded-none border-border focus:border-foreground transition-colors"
+                  required
                 />
                 {error && (error as ApiError)?.data?.errors?.password && (
                   <p className="text-xs text-destructive">
@@ -167,6 +183,7 @@ function SignupPage() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className="h-11 rounded-none border-border focus:border-foreground transition-colors"
+                  required
                 />
                 {error && (error as ApiError)?.data?.errors?.confirmPassword && (
                   <p className="text-xs text-destructive">
@@ -182,12 +199,6 @@ function SignupPage() {
               >
                 {isLoading ? <Spinner className="h-4 w-4" /> : "Create Account"}
               </Button>
-
-              {error && (error as ApiError)?.data?.message && (
-                <p className="text-xs text-destructive text-center">
-                  {(error as ApiError).data.message}
-                </p>
-              )}
             </form>
 
             <div className="relative">

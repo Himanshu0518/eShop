@@ -14,7 +14,7 @@ function Product() {
   const navigate = useNavigate();
   const { data: product, isLoading, isError, isSuccess } = useGetProductQuery(Number(productId));
   const [addToCart, { isLoading: isAddingToCart }] = useAddToCartMutation();
-
+  
   const [toggleFavorite] = useToggleFavouriteMutation();
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);

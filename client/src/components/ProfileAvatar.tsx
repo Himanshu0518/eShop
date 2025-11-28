@@ -8,26 +8,36 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useCurrentUserQuery } from "@/services/user.services";
+
 import { Link } from "react-router";
 import { useLogOutMutation } from "@/services/user.services";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useDispatch,useSelector } from "react-redux";
+import { setUser } from "@/store/authSlice";
 
 function ProfileAvatar() {
-  const { data: user } = useCurrentUserQuery();
-const [logOut] = useLogOutMutation();
-const navigate = useNavigate();
+  const user = useSelector((state: any) => state.auth.user);
+  const [logOut] = useLogOutMutation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  
+  const handleLogout = async () => {
+    try {
+      await logOut().unwrap(); 
+      toast.success("Logged out successfully!", {
+        description: "See you next time",
+      });
+      dispatch(setUser(null));
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Failed to logout", {
+        description: "Please try again",
+      });
+    }
+  };
 
-const handleLogout = async () => {
-  try {
-     toast.success("You are logged out successfully!");
-    await logOut().unwrap(); 
-    navigate("/login", { replace: true });
-  } catch (error) {
-    console.error("Logout failed:", error);
-  }
-};
   return (
     <div>
       {user ? (
@@ -56,7 +66,7 @@ const handleLogout = async () => {
 
             <DropdownMenuItem
               onClick={handleLogout}
-              className="flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-100 cursor-pointer"
+              className="flex items-center gap-3 px-3 py-2 text-sm text-black hover:bg-muted cursor-pointer"
             >
               <LogOut className="h-4 w-4" />
               Logout
@@ -66,18 +76,7 @@ const handleLogout = async () => {
       ) : (
         <Link
           to="/login"
-          className="
-            px-6
-            py-2
-            bg-black
-            text-white
-            font-medium
-            uppercase
-            tracking-wide
-            hover:bg-neutral-900
-            transition-colors
-            rounded-none
-          "
+          className="px-6 py-2 bg-black text-white font-medium uppercase tracking-wide hover:bg-neutral-900 transition-colors rounded-none"
         >
           Login
         </Link>
