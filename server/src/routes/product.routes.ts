@@ -8,6 +8,7 @@ import { getAllProducts,
   addProductView,
   getProductViews,
   addWordEmbedding} from "../controllers/product.controller";
+  import { getReccomendationByProduct } from "../controllers/recommendation.controller";
 import { VerifyJWT } from "../middlewares/authMiddleware";
 import { upload } from "../middlewares/multerMiddleware";
 import { ValidateProductAddition } from "../middlewares/Validation";
@@ -40,4 +41,7 @@ router.route('/getViews').get(VerifyJWT,getProductViews);
 router.route('/addEmbedding').post(addWordEmbedding);
 
 router.route('/embeddings/bulk').post(bulkAddWordEmbeddings);
+
+router.route('/getrecommendations/:productId').get(getReccomendationByProduct);
+
 export default router;

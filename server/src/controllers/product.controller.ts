@@ -310,7 +310,6 @@ const addWordEmbedding = asyncHandler(async (req: Request, res: Response) => {
 );
 
 
-
       
             return  res.status(201).json({
                 success:true,
@@ -421,5 +420,5 @@ export {
     addProductView,
     getProductViews,
     addWordEmbedding,
-     bulkAddWordEmbeddings 
+    bulkAddWordEmbeddings 
 };
