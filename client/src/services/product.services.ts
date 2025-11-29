@@ -78,7 +78,13 @@ export const productApi = createApi({
     getViews: builder.query<ProductViewResponse, void>({
       query: () => "/products/getViews",
       providesTags: ["ProductView"]
-    })
+    }),
+
+    getProductByquery: builder.query<ProductListResponse, string>({
+      query: (query) => `/products/getrecommendations?query=${query}`,
+      providesTags: ["Product"]
+    }),
+  
 
   }),
 });
@@ -91,5 +97,6 @@ export const {
   useCreateProductMutation,
   useUpdateProductMutation,
   useAddViewMutation,
-  useGetViewsQuery
+  useGetViewsQuery,
+  useGetProductByqueryQuery
 } = productApi;

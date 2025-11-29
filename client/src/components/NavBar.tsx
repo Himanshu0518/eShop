@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Search, ShoppingCart, Heart, Menu } from "lucide-react";
+import {  ShoppingCart, Heart, Menu } from "lucide-react";
 import ProfileAvatar from "./ProfileAvatar";
 import {
   Sheet,
@@ -66,13 +66,6 @@ function NavBar() {
 
           {/* Right - Actions */}
           <div className="flex items-center gap-1 md:gap-2">
-            <button
-              className="p-2.5 rounded-full hover:bg-muted transition-colors"
-              aria-label="Search"
-            >
-              <Search className="h-5 w-5" strokeWidth={1.5} />
-            </button>
-
             <Link
               to="/favourite"
               className="p-2.5 rounded-full hover:bg-muted transition-colors relative"

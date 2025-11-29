@@ -9,6 +9,7 @@ import RecentlyViewed from "@/components/RecentlyViewed";
 
 function Home() {
  
+
   return (
     <>
       <Hero />

@@ -7,7 +7,7 @@ import { Heart, ShoppingCart, ArrowLeft, Check } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { useAddViewMutation } from "@/services/product.services";
 import ProductCard from "@/components/ProductCard";
-
+import { useSelector } from "react-redux";
 function Product() {
   const { productId } = useParams();
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ function Product() {
   
   // Try to find product from cache
   const cachedProduct = allProducts?.data?.find(p => p.id === Number(productId));
-  
+  const authStatus = useSelector((state: any) => state.auth.status);
   const calculateNetPrice = (price: number, discount: number) => {
     return price - (price * discount) / 100;
   };
@@ -51,10 +51,10 @@ function Product() {
 
   // Track view when product ID changes
   useEffect(() => {
-    if (productId) {
+    if (productId && authStatus) {
       addView(Number(productId));
     }
-  }, [productId, addView]);
+  }, [productId, addView, authStatus]);
 
   const handleAddToCart = async () => {
     try {
@@ -278,7 +278,7 @@ function Product() {
           <div className="mt-24 pt-16 border-t border-gray-200">
             <div className="mb-12">
               <h2 className="text-2xl md:text-3xl font-light text-black mb-3">
-                You Might Also Like
+               Similar products
               </h2>
               <div className="h-px w-16 bg-black"></div>
             </div>
