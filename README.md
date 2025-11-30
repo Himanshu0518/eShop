@@ -144,7 +144,7 @@ server/
 
 ### Database Schema
 
-![Database Schema](client\public\dbSchema.png)
+![Database Schema](server/public/dbSchema.png)
 
 **Live diagram:**  
 👉 https://dbdiagram.io/d/692c25f8d6676488baf1aa00
