@@ -14,7 +14,8 @@ import {
   Kids,
   Accessories,
   NewArrivals,
-  Product
+  Product,
+  About
 } from "@/pages";
 
 const router = createBrowserRouter([
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
       {
         path: "contact",
         element: <Contact />,
+      },
+      {
+    path:"/about",
+    element: <About/>
       },
       {
         path: "new-arrivals",

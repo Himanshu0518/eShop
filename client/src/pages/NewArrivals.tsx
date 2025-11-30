@@ -1,23 +1,22 @@
-import { Heart, ShoppingCart, Search, Lightbulb } from "lucide-react";
+import { Heart, ShoppingCart} from "lucide-react";
 import { Link } from "react-router-dom";
-import { useGetProductsQuery } from "@/services/product.services";
+import { useGetProductsQuery, } from "@/services/product.services";
 import { useAddToCartMutation } from "@/services/cart.services";
 import { useToggleFavouriteMutation } from "@/services/favourites.services";
 import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
-import type { Product } from "@/types/product.types";
 import { useSelector } from "react-redux";
 
 export default function NewArrivals() {
-  const { data: allProducts, error, isLoading, isSuccess } = useGetProductsQuery();
+  const { data: products, error, isLoading, isSuccess } = useGetProductsQuery();
   const [addToCart] = useAddToCartMutation();
   const [toggleFavourite] = useToggleFavouriteMutation();
   const [loadingStates, setLoadingStates] = useState<{ [key: number]: { cart: boolean; fav: boolean } }>({});
-  const [products, setProducts] = useState<Product[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [deepSearch, setDeepSearch] = useState<boolean>(false);
+  
+
+
   const authStatus = useSelector((state: any) => state.auth.status);
  
   const handleAddToCart = async (e: React.MouseEvent, productId: number, productName: string) => {
@@ -70,18 +69,7 @@ export default function NewArrivals() {
     }
   };
 
-  useEffect(() => {
-    if (searchTerm) {
-      const filtered = allProducts?.data?.filter(product => 
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      if (filtered) {
-        setProducts(filtered);
-      }
-    } else {
-      setProducts(allProducts?.data ?? []);
-    }
-  }, [searchTerm, allProducts]);
+
 
   return (
     <section className="py-12 md:py-20 px-6 md:px-16 lg:px-24 bg-muted/30">
@@ -100,35 +88,7 @@ export default function NewArrivals() {
             </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="relative max-w-2xl">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                className="w-full rounded-lg border border-input bg-background pl-12 pr-14 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all duration-200"
-                value={searchTerm || ""}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <button
-                onClick={() => setDeepSearch(!deepSearch)}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md transition-colors ${
-                  deepSearch 
-                    ? 'text-yellow-500 bg-yellow-500/10' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                }`}
-                title="Deep Search (Coming Soon)"
-              >
-                <Lightbulb className="w-5 h-5" />
-              </button>
-            </div>
-            {deepSearch && (
-              <p className="mt-2 text-xs text-muted-foreground italic">
-                🔍 Deep semantic search coming soon...
-              </p>
-            )}
-          </div>
+       
         </div>
 
         {/* Loading State */}
@@ -168,24 +128,11 @@ export default function NewArrivals() {
           </div>
         )}
 
-        {/* No Results State */}
-        {isSuccess && products.length === 0 && searchTerm && (
-          <div className="flex items-center justify-center py-20">
-            <div className="text-center space-y-2">
-              <p className="text-muted-foreground">No products found for "{searchTerm}"</p>
-              <button 
-                onClick={() => setSearchTerm('')}
-                className="text-sm text-primary hover:underline"
-              >
-                Clear search
-              </button>
-            </div>
-          </div>
-        )}
+  
 
         {/* Products Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-          {isSuccess && products.map((product) => (
+          {isSuccess && products.data.map((product) => (
             <div key={product.id} className="group relative">
               <Link to={`/product/${product.id}`} className="block">
                 <div className="space-y-4">

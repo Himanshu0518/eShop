@@ -11,6 +11,7 @@ import Kids from "@/pages/Kids";
 import Accessories from "@/pages/Accessories";
 import NewArrivals from "@/pages/NewArrivals";
 import Product from "./Product";
+import About from "./About";
 
 export {  
   Home,
@@ -25,5 +26,6 @@ export {
     Kids,
     Accessories,
     NewArrivals,
-    Product
+    Product,
+    About
 };

@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import {  ShoppingCart, Heart, Menu } from "lucide-react";
+import { ShoppingCart, Heart, Menu } from "lucide-react";
 import ProfileAvatar from "./ProfileAvatar";
+import SearchBar from "./SearchBar";
 import {
   Sheet,
   SheetContent,
@@ -14,6 +15,7 @@ const NavItems = [
   { name: "Home", path: "/" },
   { name: "Contact", path: "/contact" },
   { name: "Orders", path: "/orders" },
+  { name: "About", path: "/about" },
 ];
 
 function NavBar() {
@@ -28,8 +30,8 @@ function NavBar() {
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
         <div className="flex justify-between items-center h-16 md:h-18">
-          {/* Left - Mobile Menu & Logo / Desktop Nav */}
-          <div className="flex items-center gap-6">
+          {/* Left - Mobile Menu & Logo */}
+          <div className="flex items-center gap-4">
             {/* Mobile Menu */}
             <div className="lg:hidden">
               <MobileNavBar 
@@ -38,7 +40,7 @@ function NavBar() {
               />
             </div>
 
-            {/* Logo - Left on Mobile, after menu on Desktop */}
+            {/* Logo */}
             <Link
               to="/"
               className="text-xl md:text-2xl font-semibold tracking-tight"
@@ -47,7 +49,7 @@ function NavBar() {
             </Link>
 
             {/* Desktop Nav Items */}
-            <div className="hidden lg:flex items-center gap-8">
+            <div className="hidden lg:flex items-center gap-8 ml-8">
               {NavItems.map((item) => (
                 <Link
                   key={item.name}
@@ -66,6 +68,11 @@ function NavBar() {
 
           {/* Right - Actions */}
           <div className="flex items-center gap-1 md:gap-2">
+          
+            
+              <SearchBar/>
+            
+
             <Link
               to="/favourite"
               className="p-2.5 rounded-full hover:bg-muted transition-colors relative"

@@ -9,7 +9,7 @@ import { getAllProducts,
   getProductViews,
   addWordEmbedding,
 } from "../controllers/product.controller";
-  import { getReccomendationByProduct,getRecommendationByQuery } from "../controllers/recommendation.controller";
+  import { getReccomendationByProduct,getRecommendationByQuery,getRecommendationByUserHistory } from "../controllers/recommendation.controller";
 import { VerifyJWT } from "../middlewares/authMiddleware";
 import { upload } from "../middlewares/multerMiddleware";
 import { ValidateProductAddition } from "../middlewares/Validation";
@@ -47,4 +47,5 @@ router.route('/getrecommendations/:productId').get(getReccomendationByProduct);
 
 router.route('/getrecommendations').get(getRecommendationByQuery);
 
+router.route('/getuserrecommendations').get(VerifyJWT,getRecommendationByUserHistory);
 export default router;
