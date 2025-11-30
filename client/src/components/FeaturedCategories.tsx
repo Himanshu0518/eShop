@@ -5,29 +5,29 @@ import { Link } from "react-router-dom";
 const categories = [
   {
     name: "Women",
-    image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&h=800&fit=crop",
+    image: "/WomenImg.jpg",
     href: "/category/women",
   },
   {
     name: "Men",
-    image: "https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?w=600&h=800&fit=crop",
+    image: "MenImg.jpg",
     href: "/category/men",
   },
   {
     name: "Kids",
-    image: "https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=600&h=800&fit=crop",
+    image: "KidsImg.jpg",
     href: "/category/kids",
   },
   {
     name: "Accessories",
-    image: "https://images.unsplash.com/photo-1523779917675-b6ed3a42a561?w=600&h=800&fit=crop",
+    image: "AccessoriesImg.jpg",
     href: "/category/accessories",
   },
 ];
 
 export default function FeaturedCategories() {
   return (
-    <section className="py-18 md:py-30 px-6 md:px-16 lg:px-24">
+    <section className="py-16 md:py-24 px-6 md:px-16 lg:px-24">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">

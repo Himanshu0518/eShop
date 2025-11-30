@@ -1,5 +1,5 @@
 import { useGetRecommendationByUserQuery } from "@/services/product.services";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "@/store/authSlice";
 import Spinner from "./Spinner";
 import ProductCard from "./ProductCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -7,7 +7,7 @@ import { useRef } from "react";
 import { Button } from "./ui/button";
 
 export default function UserRecommendation() {
-  const authStatus  = useSelector((state: any) => state.auth.status);
+  const authStatus  = useAppSelector((state) => state.auth.status);
   
   
   const { data: products, error, isLoading, isSuccess } = useGetRecommendationByUserQuery(
@@ -39,7 +39,7 @@ export default function UserRecommendation() {
 
   if (isLoading) {
     return (
-      <section className="py-20 md:py-32 px-6 md:px-16 lg:px-24 bg-background">
+      <section className="py-20 md:py-32 px-6 md:px-16 lg:px-24  bg-muted/30">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center py-20">
             <div className="text-center space-y-4">
@@ -62,7 +62,7 @@ export default function UserRecommendation() {
   const shouldScroll = itemCount > 4;
 
   return (
-    <section className="py-20 md:py-32 px-6 md:px-16 lg:px-24 bg-background">
+    <section className="py-16 md:py-20 px-6 md:px-16 lg:px-24 bg-background">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-8">

@@ -4,14 +4,11 @@ import { userApi } from '@/services/user.services'
 import { productApi } from '@/services/product.services'
 import { cartApi } from '@/services/cart.services'
 import { favouriteApi } from '@/services/favourites.services'
-import authReducer from './authSlice'; 
-
+import authReducer from './authSlice'
 
 export const store = configureStore({
   reducer: {
-
     auth: authReducer,
-
     
     [userApi.reducerPath]: userApi.reducer,
     [cartApi.reducerPath]: cartApi.reducer,
@@ -29,3 +26,7 @@ export const store = configureStore({
 })
 
 setupListeners(store.dispatch)
+
+// Infer the `RootState` and `AppDispatch` types from the store itself
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch

@@ -1,7 +1,7 @@
 import { Heart, ShoppingCart } from "lucide-react";
 import { useAddToCartMutation } from "@/services/cart.services";
 import { useToggleFavouriteMutation } from "@/services/favourites.services";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "@/store/authSlice";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
@@ -9,13 +9,15 @@ import { Link, useNavigate } from "react-router-dom";
 import Spinner from "./Spinner";
 import type { Product } from "@/types/product.types";
 
+
 interface ProductCardProps {
   product: Product;
 }
 
+
 function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
-  const  currentUser = useSelector((state: any) => state.auth.user);
+  const  currentUser = useAppSelector((state) => state.auth.user);
   const isLoggedIn = !!currentUser?.data;
 
   const [addToCart] = useAddToCartMutation();

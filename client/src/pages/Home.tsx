@@ -8,19 +8,16 @@ import RecentlyViewed from "@/components/RecentlyViewed";
 import UserRecommendation from "@/components/UserRecommendation";
 
 function Home() {
- 
-
   return (
     <>
       <Hero />
-      <Features />
-      <RecentlyViewed />
-      <UserRecommendation />
       <FeaturedCategories />
+      <UserRecommendation />
       <NewArrivals />
+      <RecentlyViewed />
       <PromoSection />
+      <Features />
       <Newsletter />
-      
     </>
   );
 }

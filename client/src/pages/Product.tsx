@@ -7,7 +7,9 @@ import { Heart, ShoppingCart, ArrowLeft, Check } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { useAddViewMutation } from "@/services/product.services";
 import ProductCard from "@/components/ProductCard";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "@/store/authSlice";
+
+
 function Product() {
   const { productId } = useParams();
   const navigate = useNavigate();
@@ -17,7 +19,7 @@ function Product() {
   
   // Try to find product from cache
   const cachedProduct = allProducts?.data?.find(p => p.id === Number(productId));
-  const authStatus = useSelector((state: any) => state.auth.status);
+  const authStatus = useAppSelector((state) => state.auth.status);
   const calculateNetPrice = (price: number, discount: number) => {
     return price - (price * discount) / 100;
   };

@@ -1,98 +1,90 @@
-import React from 'react';
+import { Link } from 'react-router-dom';
 
 function About() {
   const features = [
     {
       title: 'Recently Viewed',
-      description: 'Track and display user browsing history across sessions'
+      description: 'Session-persistent browsing history that helps users continue exploring seamlessly.'
     },
     {
       title: 'AI Recommendations',
-      description: 'Smart product suggestions using pgvector and embeddings'
+      description: 'Semantic product matching powered by pgvector and Gemini embeddings.'
     },
     {
       title: 'Secure Authentication',
-      description: 'Protected user accounts with JWT-based authentication'
+      description: 'Robust security with JWT tokens and encrypted user information.'
     },
     {
       title: 'Responsive Design',
-      description: 'Seamless experience across all devices and screen sizes'
+      description: 'A beautifully responsive interface for mobile, tablet, and desktop.'
     }
   ];
 
-  const technologies = [
-    'React & Redux Toolkit Query',
-    'Node.js & Express',
-    'PostgreSQL with pgvector',
-    'Gemini-004 for Embeddings',
-    'RESTful API Architecture',
-    'JWT Authentication'
-  ];
+  const techStack = {
+    frontend: ['React 18', 'Redux Toolkit Query', 'Tailwind CSS', 'Shadcn UI'],
+    backend: ['Node.js', 'Express.js', 'JWT Authentication', 'REST API'],
+    database: ['PostgreSQL', 'pgvector', 'Indexed Queries'],
+    ai: ['Gemini-004', 'Vector Embeddings', 'Semantic Search']
+  };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <div className="border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 py-20">
+    <div className="min-h-screen bg-background">
+
+      {/* HERO SECTION */}
+      <div className="border-b border-border bg-gradient-to-b from-muted/20 to-background">
+        <div className="max-w-4xl mx-auto px-6 py-20 md:py-28">
           <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-light text-gray-900 mb-6 tracking-tight">
-              About This Project
+            <h1 className="text-4xl md:text-5xl font-light text-foreground tracking-tight leading-tight">
+              Modern E-Commerce,
+              <br />
+              <span className="text-muted-foreground">Built from Scratch</span>
             </h1>
-            <p className="text-lg text-gray-600 leading-relaxed font-light">
-              A full-stack e-commerce platform developed as part of academic curriculum, 
-              showcasing modern web development practices and technologies.
+            <p className="mt-6 max-w-md text-muted-foreground font-light leading-relaxed">
+              A complete full-stack e-commerce experience crafted with modern technology,
+              optimized design, and AI-powered intelligence.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Project Overview */}
-      <div className="max-w-6xl mx-auto px-6 py-16">
-        <div className="grid md:grid-cols-2 gap-16">
-          <div>
-            <h2 className="text-2xl font-light text-gray-900 mb-6 tracking-tight">Project Overview</h2>
-            <p className="text-gray-600 mb-4 leading-relaxed font-light">
-              This e-commerce platform is a comprehensive college project that demonstrates 
-              the implementation of modern web technologies and best practices in full-stack 
-              development.
-            </p>
-            <p className="text-gray-600 mb-4 leading-relaxed font-light">
-              The application features a complete shopping experience including product browsing, 
-              cart management, user authentication, and order processing. Built with scalability 
-              and user experience in mind.
-            </p>
-            <p className="text-gray-600 leading-relaxed font-light">
-              Key features include recently viewed products tracking, advanced filtering, 
-              responsive design, and a clean, minimalist interface inspired by modern 
-              e-commerce standards.
-            </p>
-          </div>
-          <div>
-            <h2 className="text-2xl font-light text-gray-900 mb-6 tracking-tight">Technologies Used</h2>
-            <div className="space-y-3">
-              {technologies.map((tech, index) => (
-                <div key={index} className="flex items-center border-b border-gray-100 pb-3">
-                  <div className="w-1 h-1 bg-gray-900 rounded-full mr-3"></div>
-                  <span className="text-gray-700 font-light">{tech}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+
+      {/* PROJECT STORY */}
+      <div className="max-w-4xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-light text-foreground mb-8 tracking-tight">The Project</h2>
+        <div className="space-y-6 text-muted-foreground leading-relaxed">
+          <p className="text-lg font-light">
+            This platform began as an academic project with an ambitious goal — to build
+            a polished, production-ready application comparable to modern commercial systems.
+          </p>
+          <p className="font-light">
+            Every part of the system, from backend architecture to responsive UI, was
+            intentionally crafted to demonstrate real-world full-stack development skills.
+          </p>
+          <p className="font-light">
+            What makes this project stand out is the integration of AI-powered recommendation
+            systems using vector embeddings — a feature typically exclusive to
+            enterprise-grade applications.
+          </p>
         </div>
       </div>
 
-      {/* Features Section */}
-      <div className="bg-gray-50 border-y border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 py-16">
-          <h2 className="text-2xl font-light text-gray-900 mb-12 tracking-tight">Key Features</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <div key={index} className="bg-white border border-gray-200 p-6">
-                <h3 className="text-lg font-normal text-gray-900 mb-3 tracking-tight">
-                  {feature.title}
+
+      {/* FEATURES GRID */}
+      <div className="bg-muted/30 border-y border-border">
+        <div className="max-w-5xl mx-auto px-6 py-20">
+          <h2 className="text-3xl font-light text-foreground mb-12 tracking-tight">Core Features</h2>
+
+          <div className="grid sm:grid-cols-2 gap-6">
+            {features.map((f, i) => (
+              <div
+                key={i}
+                className="bg-background border border-border p-7 rounded-md hover:shadow-lg transition-all hover:border-foreground/20"
+              >
+                <h3 className="text-lg font-normal text-foreground mb-2 tracking-tight">
+                  {f.title}
                 </h3>
-                <p className="text-sm text-gray-600 leading-relaxed font-light">
-                  {feature.description}
+                <p className="text-sm text-muted-foreground leading-relaxed font-light">
+                  {f.description}
                 </p>
               </div>
             ))}
@@ -100,62 +92,102 @@ function About() {
         </div>
       </div>
 
-      {/* Implementation Details */}
-      <div className="max-w-6xl mx-auto px-6 py-16">
-        <h2 className="text-2xl font-light text-gray-900 mb-12 tracking-tight">Implementation Highlights</h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="border-l-2 border-gray-900 pl-6">
-            <h3 className="text-lg font-normal text-gray-900 mb-3 tracking-tight">Frontend</h3>
-            <p className="text-sm text-gray-600 leading-relaxed font-light">
-              Built with React and Redux Toolkit for state management. 
-              Implements RTK Query for efficient data fetching and caching.
-            </p>
-          </div>
-          <div className="border-l-2 border-gray-900 pl-6">
-            <h3 className="text-lg font-normal text-gray-900 mb-3 tracking-tight">Backend</h3>
-            <p className="text-sm text-gray-600 leading-relaxed font-light">
-              RESTful API built with Node.js and Express. Database design includes 
-              optimized queries and proper indexing.
-            </p>
-          </div>
-          <div className="border-l-2 border-gray-900 pl-6">
-            <h3 className="text-lg font-normal text-gray-900 mb-3 tracking-tight">AI Recommendations</h3>
-            <p className="text-sm text-gray-600 leading-relaxed font-light">
-              Vector-based recommendation system using pgvector extension. 
-              Product embeddings generated using Gemini-004 model for semantic similarity.
-            </p>
+
+      {/* TECH STACK */}
+      <div className="max-w-6xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-light text-foreground mb-12 tracking-tight">Technology Stack</h2>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+          {Object.entries(techStack).map(([category, items]) => (
+            <div key={category}>
+              <h3 className="text-sm uppercase tracking-wider text-muted-foreground mb-4 font-medium">
+                {category}
+              </h3>
+
+              <div className="space-y-3">
+                {items.map((t, i) => (
+                  <div key={i} className="flex items-center">
+                    <div className="w-1.5 h-1.5 bg-foreground rounded-full mr-3"></div>
+                    <span className="text-foreground/90 font-light text-sm">{t}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+
+      {/* TECH HIGHLIGHTS */}
+      <div className="bg-muted/30 border-y border-border">
+        <div className="max-w-5xl mx-auto px-6 py-20">
+          <h2 className="text-3xl font-light text-foreground mb-12 tracking-tight">
+            Technical Highlights
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-10">
+            {[
+              {
+                title: 'Frontend Architecture',
+                desc: 'React 18 component architecture with RTK Query for server state, caching, and auto refetching.'
+              },
+              {
+                title: 'Backend Design',
+                desc: 'REST APIs with validation, middleware-based error handling, and optimized SQL queries.'
+              },
+              {
+                title: 'AI Integration',
+                desc: 'Gemini embeddings + pgvector powering semantic recommendations far beyond keyword search.'
+              }
+            ].map((h, i) => (
+              <div key={i} className="space-y-4">
+                <div className="w-14 h-0.5 bg-foreground"></div>
+                <h3 className="text-xl font-light text-foreground tracking-tight">{h.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed font-light">{h.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Academic Context */}
-      <div className="bg-gray-50 border-t border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 py-16">
-          <div className="max-w-3xl">
-            <h2 className="text-2xl font-light text-gray-900 mb-6 tracking-tight">About Developer</h2>
-            <p className="text-gray-600 mb-4 leading-relaxed font-light">
-              Developed by Himanshu Singh, B.Tech 3rd Year Electronics and Communication Engineering student.
-            </p>
-            <p className="text-gray-600 leading-relaxed font-light">
-              This project demonstrates practical application of full-stack development skills, 
-              modern database techniques including vector embeddings, and AI-powered features 
-              for an enhanced e-commerce experience.
-            </p>
-          </div>
+
+      {/* ABOUT DEVELOPER */}
+      <div className="max-w-4xl mx-auto px-6 py-20">
+        <div className="border border-border rounded-md p-10 bg-muted/20">
+          <h2 className="text-2xl font-light text-foreground mb-6 tracking-tight">
+            About the Developer
+          </h2>
+
+          <p className="text-muted-foreground mb-4 leading-relaxed font-light">
+            Built by <span className="text-foreground font-normal">Himanshu Singh</span>, 
+            a 3rd year B.Tech ECE student passionate about modern web development and AI integration.
+          </p>
+
+          <p className="text-muted-foreground leading-relaxed font-light">
+            This project represents months of deep learning, design exploration, and hands-on
+            problem solving — combining frontend, backend, database engineering,
+            and applied AI/ML techniques.
+          </p>
         </div>
       </div>
 
-      {/* Footer CTA */}
-      <div className="border-t border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 py-12 text-center">
-          <h3 className="text-xl font-light text-gray-900 mb-4 tracking-tight">
-            Explore the Platform
-          </h3>
-          <button className="px-8 py-3 bg-gray-900 text-white text-sm tracking-wide hover:bg-gray-800 transition-colors font-light">
-            VIEW PRODUCTS
-          </button>
+
+      {/* CTA */}
+      <div className="border-t border-border bg-foreground text-background">
+        <div className="max-w-5xl mx-auto px-6 py-16 text-center">
+          <h3 className="text-2xl font-light mb-3 tracking-tight">Experience the Platform</h3>
+          <p className="text-background/70 mb-8 font-light">
+            Explore the features and see the technology in action.
+          </p>
+          <Link
+            to="/products"
+            className="inline-block px-10 py-4 bg-background text-foreground text-sm uppercase tracking-wider hover:bg-background/90 transition-colors font-light rounded-md"
+          >
+            Browse Products
+          </Link>
         </div>
       </div>
+
     </div>
   );
 }

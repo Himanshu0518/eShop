@@ -1,5 +1,5 @@
 import { useGetViewsQuery } from "@/services/product.services";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "@/store/authSlice";
 import Spinner from "./Spinner";
 import ProductCard from "./ProductCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -7,7 +7,7 @@ import { useRef } from "react";
 import { Button } from "./ui/button";
 
 export default function RecentlyViewed() {
-  const authStatus  = useSelector((state: any) => state.auth.status);
+  const authStatus  = useAppSelector((state) => state.auth.status);
   
   
   const { data: recentProducts, error, isLoading, isSuccess } = useGetViewsQuery(undefined, {
@@ -59,7 +59,7 @@ export default function RecentlyViewed() {
   const shouldScroll = itemCount > 4;
 
   return (
-    <section className="py-20 md:py-32 px-6 md:px-16 lg:px-24 bg-background">
+    <section className="py-16 md:py-20 px-6 md:px-16 lg:px-24 bg-background">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-8">
@@ -106,7 +106,7 @@ export default function RecentlyViewed() {
               {recentProducts.data.map((view) => (
                 <div
                   key={view.id}
-                  className="flex-shrink-0 w-[180px] sm:w-[220px] md:w-[260px]"
+                  className="shrink-0 w-[180px] sm:w-[220px] md:w-[260px]"
                 >
                   <ProductCard product={view.product} />
                 </div>

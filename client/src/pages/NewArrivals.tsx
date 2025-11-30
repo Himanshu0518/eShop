@@ -6,8 +6,8 @@ import { useToggleFavouriteMutation } from "@/services/favourites.services";
 import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useState } from "react";
+import { useAppSelector } from "@/store/authSlice";
 
 export default function NewArrivals() {
   const { data: products, error, isLoading, isSuccess } = useGetProductsQuery();
@@ -17,7 +17,7 @@ export default function NewArrivals() {
   
 
 
-  const authStatus = useSelector((state: any) => state.auth.status);
+  const authStatus = useAppSelector((state) => state.auth.status);
  
   const handleAddToCart = async (e: React.MouseEvent, productId: number, productName: string) => {
     e.preventDefault();

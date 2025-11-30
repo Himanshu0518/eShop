@@ -13,14 +13,14 @@ import { Link } from "react-router";
 import { useLogOutMutation } from "@/services/user.services";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { useDispatch,useSelector } from "react-redux";
+import { useAppDispatch,useAppSelector } from "@/store/authSlice";
 import { setUser } from "@/store/authSlice";
 
 function ProfileAvatar() {
-  const user = useSelector((state: any) => state.auth.user);
+  const user = useAppSelector((state) => state.auth.user);
   const [logOut] = useLogOutMutation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   
   const handleLogout = async () => {
     try {
