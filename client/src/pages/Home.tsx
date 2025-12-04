@@ -13,8 +13,8 @@ function Home() {
       <Hero />
       <FeaturedCategories />
       <UserRecommendation />
-      <NewArrivals />
       <RecentlyViewed />
+      <NewArrivals />
       <PromoSection />
       <Features />
       <Newsletter />

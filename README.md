@@ -73,7 +73,7 @@ Two search modes for maximum flexibility:
 
 ### AI & Machine Learning
 - **Gemini-004 API** - State-of-the-art embeddings generation
-- **Vector Embeddings** - 768-dimensional product representations
+- **Vector Embeddings** - 512-dimensional product representations
 - **Cosine Similarity** - Semantic matching algorithm
 - **pgvector** - High-performance vector operations in PostgreSQL
 

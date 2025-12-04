@@ -21,7 +21,7 @@ function About() {
   ];
 
   const techStack = {
-    frontend: ['React 18', 'Redux Toolkit Query', 'Tailwind CSS', 'Shadcn UI'],
+    frontend: ['React 19', 'Redux Toolkit Query', 'Tailwind CSS', 'Shadcn UI'],
     backend: ['Node.js', 'Express.js', 'JWT Authentication', 'REST API'],
     database: ['PostgreSQL', 'pgvector', 'Indexed Queries'],
     ai: ['Gemini-004', 'Vector Embeddings', 'Semantic Search']
@@ -34,12 +34,12 @@ function About() {
       <div className="border-b border-border bg-gradient-to-b from-muted/20 to-background">
         <div className="max-w-4xl mx-auto px-6 py-20 md:py-28">
           <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-light text-foreground tracking-tight leading-tight">
+            <h1 className="text-4xl md:text-5xl font-light tracking-tight leading-tight">
               Modern E-Commerce,
               <br />
               <span className="text-muted-foreground">Built from Scratch</span>
             </h1>
-            <p className="mt-6 max-w-md text-muted-foreground font-light leading-relaxed">
+            <p className="mt-6 max-w-md text-muted-foreground/80 font-light leading-relaxed">
               A complete full-stack e-commerce experience crafted with modern technology,
               optimized design, and AI-powered intelligence.
             </p>
@@ -50,8 +50,8 @@ function About() {
 
       {/* PROJECT STORY */}
       <div className="max-w-4xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-light text-foreground mb-8 tracking-tight">The Project</h2>
-        <div className="space-y-6 text-muted-foreground leading-relaxed">
+        <h2 className="text-3xl font-light mb-8 tracking-tight">The Project</h2>
+        <div className="space-y-6 text-muted-foreground/80 leading-relaxed">
           <p className="text-lg font-light">
             This platform began as an academic project with an ambitious goal — to build
             a polished, production-ready application comparable to modern commercial systems.
@@ -72,7 +72,7 @@ function About() {
       {/* FEATURES GRID */}
       <div className="bg-muted/30 border-y border-border">
         <div className="max-w-5xl mx-auto px-6 py-20">
-          <h2 className="text-3xl font-light text-foreground mb-12 tracking-tight">Core Features</h2>
+          <h2 className="text-3xl font-light mb-12 tracking-tight">Core Features</h2>
 
           <div className="grid sm:grid-cols-2 gap-6">
             {features.map((f, i) => (
@@ -80,10 +80,10 @@ function About() {
                 key={i}
                 className="bg-background border border-border p-7 rounded-md hover:shadow-lg transition-all hover:border-foreground/20"
               >
-                <h3 className="text-lg font-normal text-foreground mb-2 tracking-tight">
+                <h3 className="text-lg font-normal mb-2 tracking-tight">
                   {f.title}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed font-light">
+                <p className="text-sm text-muted-foreground/80 leading-relaxed font-light">
                   {f.description}
                 </p>
               </div>
@@ -95,20 +95,20 @@ function About() {
 
       {/* TECH STACK */}
       <div className="max-w-6xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-light text-foreground mb-12 tracking-tight">Technology Stack</h2>
+        <h2 className="text-3xl font-light mb-12 tracking-tight">Technology Stack</h2>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
           {Object.entries(techStack).map(([category, items]) => (
             <div key={category}>
-              <h3 className="text-sm uppercase tracking-wider text-muted-foreground mb-4 font-medium">
+              <h3 className="text-sm uppercase tracking-wider text-muted-foreground/70 mb-4 font-medium">
                 {category}
               </h3>
 
               <div className="space-y-3">
                 {items.map((t, i) => (
                   <div key={i} className="flex items-center">
-                    <div className="w-1.5 h-1.5 bg-foreground rounded-full mr-3"></div>
-                    <span className="text-foreground/90 font-light text-sm">{t}</span>
+                    <div className="w-1.5 h-1.5 bg-foreground/60 rounded-full mr-3"></div>
+                    <span className="text-foreground/80 font-light text-sm">{t}</span>
                   </div>
                 ))}
               </div>
@@ -121,7 +121,7 @@ function About() {
       {/* TECH HIGHLIGHTS */}
       <div className="bg-muted/30 border-y border-border">
         <div className="max-w-5xl mx-auto px-6 py-20">
-          <h2 className="text-3xl font-light text-foreground mb-12 tracking-tight">
+          <h2 className="text-3xl font-light mb-12 tracking-tight">
             Technical Highlights
           </h2>
 
@@ -141,9 +141,9 @@ function About() {
               }
             ].map((h, i) => (
               <div key={i} className="space-y-4">
-                <div className="w-14 h-0.5 bg-foreground"></div>
-                <h3 className="text-xl font-light text-foreground tracking-tight">{h.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed font-light">{h.desc}</p>
+                <div className="w-14 h-0.5 bg-foreground/50"></div>
+                <h3 className="text-xl font-light tracking-tight">{h.title}</h3>
+                <p className="text-sm text-muted-foreground/80 leading-relaxed font-light">{h.desc}</p>
               </div>
             ))}
           </div>
@@ -154,16 +154,16 @@ function About() {
       {/* ABOUT DEVELOPER */}
       <div className="max-w-4xl mx-auto px-6 py-20">
         <div className="border border-border rounded-md p-10 bg-muted/20">
-          <h2 className="text-2xl font-light text-foreground mb-6 tracking-tight">
+          <h2 className="text-2xl font-light mb-6 tracking-tight">
             About the Developer
           </h2>
 
-          <p className="text-muted-foreground mb-4 leading-relaxed font-light">
+          <p className="text-muted-foreground/80 mb-4 leading-relaxed font-light">
             Built by <span className="text-foreground font-normal">Himanshu Singh</span>, 
             a 3rd year B.Tech ECE student passionate about modern web development and AI integration.
           </p>
 
-          <p className="text-muted-foreground leading-relaxed font-light">
+          <p className="text-muted-foreground/80 leading-relaxed font-light">
             This project represents months of deep learning, design exploration, and hands-on
             problem solving — combining frontend, backend, database engineering,
             and applied AI/ML techniques.
@@ -176,7 +176,7 @@ function About() {
       <div className="border-t border-border bg-foreground text-background">
         <div className="max-w-5xl mx-auto px-6 py-16 text-center">
           <h3 className="text-2xl font-light mb-3 tracking-tight">Experience the Platform</h3>
-          <p className="text-background/70 mb-8 font-light">
+          <p className="text-background/80 mb-8 font-light">
             Explore the features and see the technology in action.
           </p>
           <Link

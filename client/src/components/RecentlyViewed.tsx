@@ -59,7 +59,7 @@ export default function RecentlyViewed() {
   const shouldScroll = itemCount > 4;
 
   return (
-    <section className="py-16 md:py-20 px-6 md:px-16 lg:px-24 bg-background">
+    <section className="py-12 md:py-16 px-6 md:px-16 lg:px-24 bg-background">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-8">
