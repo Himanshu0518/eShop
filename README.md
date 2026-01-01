@@ -238,6 +238,48 @@ This will:
 - Generate test orders
 - Populate categories
 
+### **7. When making any change to embeddings or database schema**
+
+If you modify the database schema directly in **Neon** (for example: changing embeddings, adding a column, or updating relations), follow these steps to keep Prisma in sync **without resetting data**.
+
+---
+
+#### **7.1 — Apply the change in Neon**
+Run the required SQL command in the **Neon SQL Console** to update the database schema.
+
+---
+
+#### **7.2 — Create an empty migration locally**
+Create a new migration folder:
+
+```bash
+mkdir prisma/migrations/20251201_add_product_to_order
+Inside the folder, create a migration.sql file:
+
+touch prisma/migrations/20251201_add_product_to_order/migration.sql
+
+
+Add a comment to indicate the change was applied manually:
+
+-- Schema updated manually in Neon
+
+7.3 — Mark the migration as applied
+
+Tell Prisma that this migration has already been applied to the database:
+
+npx prisma migrate resolve --applied 20251201_add_product_to_order
+
+
+This updates Prisma’s migration history without modifying the database.
+
+7.4 — Verify migration status
+
+Always verify that Prisma is in sync with the database:
+
+npx prisma migrate status
+
+```
+
 ### Running the Application
 
 **Development Mode:**

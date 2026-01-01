@@ -1,5 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useGetProductsQuery, useGetProductQuery, useGetRecommendedByProductQuery } from "@/services/product.services";
+import {
+  useGetProductsQuery,
+  useGetProductQuery,
+  useGetRecommendedByProductQuery,
+} from "@/services/product.services";
 import { useAddToCartMutation } from "@/services/cart.services";
 import { useToggleFavouriteMutation } from "@/services/favourites.services";
 import { useState, useEffect } from "react";
@@ -8,6 +12,13 @@ import Spinner from "@/components/Spinner";
 import { useAddViewMutation } from "@/services/product.services";
 import ProductCard from "@/components/ProductCard";
 import { useAppSelector } from "@/store/authSlice";
+import {
+  useCreateOrderMutation,
+  useVerifyPaymentMutation,
+} from "@/services/order.services";
+
+import { toast } from "sonner";
+
 
 
 function Product() {
@@ -15,32 +26,35 @@ function Product() {
   const navigate = useNavigate();
 
   // Fetch all products first
-  const { data: allProducts, isLoading: isLoadingProducts } = useGetProductsQuery();
-  
+  const { data: allProducts, isLoading: isLoadingProducts } =
+    useGetProductsQuery();
+
   // Try to find product from cache
-  const cachedProduct = allProducts?.data?.find(p => p.id === Number(productId));
+  const cachedProduct = allProducts?.data?.find(
+    (p) => p.id === Number(productId)
+  );
   const authStatus = useAppSelector((state) => state.auth.status);
+  const user = useAppSelector((state) => state.auth.user);
   const calculateNetPrice = (price: number, discount: number) => {
     return price - (price * discount) / 100;
   };
 
   // Only fetch if not in the list cache
-  const { data: detailedProduct, isLoading: isLoadingDetail } = useGetProductQuery(
-    Number(productId),
-    {
-      skip: !!cachedProduct
-    }
-  );
-  
+  const { data: detailedProduct, isLoading: isLoadingDetail } =
+    useGetProductQuery(Number(productId), {
+      skip: !!cachedProduct,
+    });
+
   // Combine both sources
   const product = cachedProduct || detailedProduct?.data;
-  
-  const { data: recommendedData, isLoading: isLoadingRecommended } = useGetRecommendedByProductQuery(Number(productId));
+
+  const { data: recommendedData, isLoading: isLoadingRecommended } =
+    useGetRecommendedByProductQuery(Number(productId));
   const recommendedProducts = recommendedData?.data;
 
   // Determine overall loading state
   const isLoading = isLoadingProducts || isLoadingDetail;
-  
+
   // Determine if product exists
   const hasProduct = !!product;
 
@@ -50,7 +64,9 @@ function Product() {
   const [addedToCart, setAddedToCart] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [addView] = useAddViewMutation();
-
+  const [createOrder] = useCreateOrderMutation();
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+  const [verifyPayment] = useVerifyPaymentMutation();
   // Track view when product ID changes
   useEffect(() => {
     if (productId && authStatus) {
@@ -68,6 +84,68 @@ function Product() {
       setTimeout(() => setAddedToCart(false), 2000);
     } catch (error) {
       console.error("Failed to add to cart:", error);
+    }
+  };
+
+  const handleCreateOrder = async () => {
+    setIsCreatingOrder(true);
+     
+    if(!authStatus){
+      navigate('/login')
+    }
+    try {
+      const totalAmount = calculateNetPrice(
+        product?.price || 0,
+        product?.discount || 0
+      );
+      const order = await createOrder({
+        productId: Number(productId),
+        quantity,
+        totalAmount,
+      }).unwrap();
+
+      console.log(order);
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY,
+        amount: totalAmount, // Amount is in currency subunits.
+        currency: "INR",
+        name: "Acme Corp",
+        description: "Test Transaction",
+        order_id: order.data.id, // This is the order_id created in the backend
+
+        handler: async function (response: any) {
+          try {
+            const res = await verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }).unwrap();
+
+            if (res.success) {
+              toast.success("Payment successful 🎉");
+            }
+          } catch (err) {
+            console.error("Payment verification failed:", err);
+            toast.error("Payment verification failed ");
+          }
+        },
+
+        prefill: {
+          name: user?.data.name,
+          email: user?.data.email,
+        },
+        theme: {
+          color: "#F37254",
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error("Failed to create order:", error);
+    } finally {
+      setIsCreatingOrder(false);
     }
   };
 
@@ -112,7 +190,9 @@ function Product() {
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
             />
           </svg>
-          <h1 className="text-xl font-light text-black mb-2">Product not found</h1>
+          <h1 className="text-xl font-light text-black mb-2">
+            Product not found
+          </h1>
           <p className="text-sm font-light text-gray-600 mb-8">
             The product you're looking for doesn't exist
           </p>
@@ -170,7 +250,11 @@ function Product() {
                 {product?.discount > 0 ? (
                   <>
                     <p className="text-3xl font-light text-black">
-                      ${calculateNetPrice(product?.price, product?.discount).toFixed(2)}
+                      $
+                      {calculateNetPrice(
+                        product?.price,
+                        product?.discount
+                      ).toFixed(2)}
                     </p>
                     <p className="text-xl font-light text-gray-400 line-through">
                       ${product?.price?.toFixed(2)}
@@ -247,6 +331,24 @@ function Product() {
               </button>
 
               <button
+                onClick={handleCreateOrder}
+                disabled={isCreatingOrder}
+                className="w-full h-12 bg-black text-white hover:bg-gray-900 disabled:opacity-70 rounded-none text-xs font-light tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                {isCreatingOrder ? (
+                  <>
+                    <div className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" />
+                    Making Order...
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="h-4 w-4" />
+                    Buy Now
+                  </>
+                )}
+              </button>
+
+              <button
                 onClick={handleToggleFavorite}
                 className="w-full h-12 border border-gray-300 hover:border-black text-black rounded-none text-xs font-light tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70"
               >
@@ -280,7 +382,7 @@ function Product() {
           <div className="mt-24 pt-16 border-t border-gray-200">
             <div className="mb-12">
               <h2 className="text-2xl md:text-3xl font-light text-black mb-3">
-               Similar products
+                Similar products
               </h2>
               <div className="h-px w-16 bg-black"></div>
             </div>

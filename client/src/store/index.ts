@@ -4,6 +4,7 @@ import { userApi } from '@/services/user.services'
 import { productApi } from '@/services/product.services'
 import { cartApi } from '@/services/cart.services'
 import { favouriteApi } from '@/services/favourites.services'
+import { orderApi } from '@/services/order.services'
 import authReducer from './authSlice'
 
 export const store = configureStore({
@@ -13,7 +14,8 @@ export const store = configureStore({
     [userApi.reducerPath]: userApi.reducer,
     [cartApi.reducerPath]: cartApi.reducer,
     [productApi.reducerPath]: productApi.reducer,
-    [favouriteApi.reducerPath]: favouriteApi.reducer
+    [favouriteApi.reducerPath]: favouriteApi.reducer,
+    [orderApi.reducerPath]: orderApi.reducer
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -21,7 +23,8 @@ export const store = configureStore({
       userApi.middleware,
       cartApi.middleware,
       productApi.middleware,
-      favouriteApi.middleware
+      favouriteApi.middleware,
+      orderApi.middleware
     ),
 })
 

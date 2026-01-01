@@ -1,0 +1,69 @@
+import type {
+  CreateOrderPayload,
+  CreateOrderResponse,
+  VerifyPaymentPayload,
+  VerifyPaymentResponse,
+  OrderResponse
+} from '@/types/order.types';
+
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+
+
+export const orderApi = createApi({
+  reducerPath: 'orderApi',
+
+  tagTypes: ["Order"],
+
+  baseQuery: fetchBaseQuery({
+    baseUrl: `${import.meta.env.VITE_CLIENT_BASE_URL}/api/orders`,
+    credentials: "include",
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem("token");
+      if (token) headers.set("Authorization", `Bearer ${token}`);
+      return headers;
+    }
+  }),
+
+  
+
+    endpoints: (builder) => ({
+    // ---------------- ORDERS ----------------
+  
+
+   createOrder: builder.mutation<CreateOrderResponse, CreateOrderPayload>({
+  query: (body) => ({
+    url: "/create-order",
+    method: "POST",
+    body,
+  }),
+  invalidatesTags: ["Order"],
+}),
+
+ // ---------------- VERIFY PAYMENT ----------------
+    verifyPayment: builder.mutation<
+      VerifyPaymentResponse,
+      VerifyPaymentPayload
+    >({
+      query: (body) => ({
+        url: '/verify-payment',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Order'],
+    }),
+
+      getOrders: builder.query<OrderResponse, void>({
+      query: () => '/getAll',
+      providesTags: ["Order"]
+    }),
+    
+
+  }),    
+});
+
+
+export const {
+   useCreateOrderMutation,
+   useVerifyPaymentMutation,
+   useGetOrdersQuery
+} = orderApi ;

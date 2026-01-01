@@ -14,14 +14,14 @@ const port = process.env.PORT || 8000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// SECOND: Cookie
+
 app.use(cookieParser());
 
 // THIRD: CORS - FIXED for deployment
 const allowedOrigins = [
   'http://localhost:5173',
-  process.env.CLIENT_URL, // Your deployed frontend URL
-].filter(Boolean); // Remove undefined values
+  process.env.CLIENT_URL,
+].filter(Boolean);
 
 app.use(cors({
   origin: allowedOrigins,
@@ -31,7 +31,6 @@ app.use(cors({
 
 }));
 
-// FOURTH: Other middlewares
 app.use(express.static("public"));
 app.use(morgan("dev"));
 app.use(helmet({
@@ -47,7 +46,10 @@ import userRoutes from './routes/user.routes';
 import productRoutes from './routes/product.routes';
 import cartRoutes from './routes/cart.routes';
 import favouriteRoutes from './routes/favourite.routes';
+import orderRoutes from './routes/order.routes';
 
+
+app.use('/api/orders', orderRoutes);
 app.use('/api/favourites', favouriteRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
