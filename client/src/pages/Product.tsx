@@ -7,7 +7,7 @@ import {
 import { useAddToCartMutation } from "@/services/cart.services";
 import { useToggleFavouriteMutation } from "@/services/favourites.services";
 import { useState, useEffect } from "react";
-import { Heart, ShoppingCart, ArrowLeft, Check } from "lucide-react";
+import { Heart, ShoppingCart, ArrowLeft, Check, ScanBarcodeIcon } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { useAddViewMutation } from "@/services/product.services";
 import ProductCard from "@/components/ProductCard";
@@ -136,7 +136,7 @@ function Product() {
           email: user?.data.email,
         },
         theme: {
-          color: "#F37254",
+           color: "#000000",
         },
       };
 
@@ -319,8 +319,7 @@ function Product() {
                   </>
                 ) : isAddingToCart ? (
                   <>
-                    <div className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" />
-                    Adding...
+                  <Spinner />
                   </>
                 ) : (
                   <>
@@ -337,12 +336,12 @@ function Product() {
               >
                 {isCreatingOrder ? (
                   <>
-                    <div className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" />
-                    Making Order...
+                    <Spinner />
+
                   </>
                 ) : (
                   <>
-                    <ShoppingCart className="h-4 w-4" />
+                    <ScanBarcodeIcon className="h-4 w-4" />
                     Buy Now
                   </>
                 )}

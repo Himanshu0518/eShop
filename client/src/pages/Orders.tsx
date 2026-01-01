@@ -1,25 +1,50 @@
 import { Button } from "@/components/ui/button";
-import { Package, ArrowRight, Clock, CheckCircle2, Truck } from "lucide-react";
+import { Package, ArrowRight, Clock, CheckCircle2, Truck, XCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGetOrdersQuery } from "@/services/order.services";
 
 function Orders() {
   const { data: ordersData, isLoading, isError } = useGetOrdersQuery();
   
-  console.log("Orders Data:", ordersData);
   const orders = ordersData?.data || [];
   const isEmpty = orders.length === 0;
 
-  const getStatusIcon = (status: string) => {
-    switch (status.toLowerCase()) {
+  const getStatusConfig = (status: string) => {
+    const statusLower = status.toLowerCase();
+    switch (statusLower) {
       case "paid":
-        return <CheckCircle2 className="h-4 w-4" />;
+      case "completed":
+        return {
+          icon: <CheckCircle2 className="h-4 w-4" />,
+          label: "Confirmed",
+          color: "text-green-700 bg-green-50 border-green-200"
+        };
       case "created":
-        return <Clock className="h-4 w-4" />;
+      case "pending":
+        return {
+          icon: <Clock className="h-4 w-4" />,
+          label: "Pending",
+          color: "text-amber-700 bg-amber-50 border-amber-200"
+        };
       case "shipped":
-        return <Truck className="h-4 w-4" />;
+      case "in transit":
+        return {
+          icon: <Truck className="h-4 w-4" />,
+          label: "Shipped",
+          color: "text-blue-700 bg-blue-50 border-blue-200"
+        };
+      case "cancelled":
+        return {
+          icon: <XCircle className="h-4 w-4" />,
+          label: "Cancelled",
+          color: "text-red-700 bg-red-50 border-red-200"
+        };
       default:
-        return <Package className="h-4 w-4" />;
+        return {
+          icon: <Package className="h-4 w-4" />,
+          label: status,
+          color: "text-gray-700 bg-gray-50 border-gray-200"
+        };
     }
   };
 
@@ -27,28 +52,34 @@ function Orders() {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
-      month: "long",
+      month: "short",
       day: "numeric",
     });
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-IN", {
+    return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
+      currency: "USD",
+      minimumFractionDigits: 2,
     }).format(price);
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-[70vh] px-6 md:px-16 lg:px-24 py-12 md:py-20">
-        <div className="max-w-4xl mx-auto">
+      <div className="min-h-[70vh] px-6 md:px-16 lg:px-24 py-16 md:py-24 bg-background">
+        <div className="max-w-5xl mx-auto">
           <div className="animate-pulse space-y-8">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="space-y-4">
+            <div className="space-y-3">
+              <div className="h-10 bg-muted rounded-none w-48"></div>
+              <div className="h-4 bg-muted rounded-none w-32"></div>
+            </div>
+            <div className="space-y-6">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-32 bg-gray-100 rounded"></div>
+                <div key={i} className="border border-border">
+                  <div className="h-24 bg-muted/30"></div>
+                  <div className="h-40 bg-background"></div>
+                </div>
               ))}
             </div>
           </div>
@@ -59,42 +90,64 @@ function Orders() {
 
   if (isError) {
     return (
-      <div className="min-h-[70vh] px-6 md:px-16 lg:px-24 py-12 md:py-20">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-muted-foreground">Failed to load orders. Please try again later.</p>
+      <div className="min-h-[70vh] px-6 md:px-16 lg:px-24 py-16 md:py-24 bg-background">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center py-20">
+            <div className="w-16 h-16 mx-auto rounded-full bg-destructive/10 flex items-center justify-center mb-6">
+              <XCircle className="h-8 w-8 text-destructive" strokeWidth={1.5} />
+            </div>
+            <h2 className="text-xl font-light mb-3">Unable to Load Orders</h2>
+            <p className="text-sm text-muted-foreground mb-8 max-w-sm mx-auto">
+              We couldn't fetch your orders. Please check your connection and try again.
+            </p>
+            <Button
+              onClick={() => window.location.reload()}
+              variant="outline"
+              className="rounded-none h-11 px-8 text-xs tracking-wider uppercase border-foreground hover:bg-foreground hover:text-background"
+            >
+              Try Again
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[70vh] px-6 md:px-16 lg:px-24 py-12 md:py-20">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-[70vh] px-6 md:px-16 lg:px-24 py-16 md:py-24 bg-background">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-3xl md:text-4xl font-extralight tracking-tight">
-            My Orders
+        <div className="mb-12 md:mb-16">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extralight tracking-tight mb-3">
+            Order History
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {isEmpty ? "No orders yet" : `${orders.length} ${orders.length === 1 ? "order" : "orders"}`}
+          <p className="text-sm text-muted-foreground tracking-wide">
+            {isEmpty 
+              ? "You haven't placed any orders yet" 
+              : `${orders.length} ${orders.length === 1 ? "order" : "orders"} in total`
+            }
           </p>
         </div>
 
         {isEmpty ? (
           /* Empty State */
-          <div className="text-center py-20">
-            <Package
-              className="h-16 w-16 mx-auto text-muted-foreground/40 mb-6"
-              strokeWidth={1}
-            />
-            <h2 className="text-xl font-light mb-2">No orders yet</h2>
-            <p className="text-muted-foreground mb-8 max-w-sm mx-auto text-sm">
-              When you place an order, it will appear here. Start shopping to
-              see your order history.
+          <div className="text-center py-20 md:py-32">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-muted/50 mb-8">
+              <Package
+                className="h-10 w-10 text-muted-foreground/60"
+                strokeWidth={1}
+              />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-extralight tracking-tight mb-4">
+              No Orders Yet
+            </h2>
+            <p className="text-muted-foreground mb-10 max-w-md mx-auto text-sm leading-relaxed">
+              Start exploring our collection and place your first order. 
+              All your purchases will appear here for easy tracking.
             </p>
             <Button
               asChild
-              className="rounded-none px-8 h-11 text-xs tracking-widest uppercase bg-black hover:bg-black/90"
+              className="rounded-none h-12 px-10 text-xs tracking-widest uppercase bg-foreground hover:bg-foreground/90 text-background"
             >
               <Link to="/">
                 Start Shopping
@@ -104,116 +157,166 @@ function Orders() {
           </div>
         ) : (
           /* Orders List */
-          <div className="space-y-6">
-            {orders.map((order) => (
-              <div
-                key={order.id}
-                className="border border-gray-200 hover:border-gray-300 transition-colors"
-              >
-                {/* Order Header */}
-                <div className="p-6 border-b border-gray-100 bg-gray-50/30">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div className="flex items-center gap-6">
-                      <div>
-                        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
-                          Order Number
-                        </p>
-                        <p className="font-light">#{order.id}</p>
-                      </div>
-                      <div className="h-8 w-px bg-gray-200"></div>
-                      <div>
-                        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
-                          Date
-                        </p>
-                        <p className="font-light text-sm">
-                          {formatDate(order.createdAt)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      {getStatusIcon(order.status)}
-                      <span className="uppercase tracking-wider text-xs">
-                        {order.status}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Order Items */}
-                <div className="p-6">
-                  {order.product && (
-                    <div className="flex gap-6">
-                      {/* Product Image */}
-                      <div className="w-24 h-32 bg-gray-100 shrink-0 overflow-hidden">
-                        {order.product.img && order.product.img ? (
-                          <img
-                            src={order.product.img}
-                            alt={order.product.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Package className="h-8 w-8 text-gray-300" strokeWidth={1} />
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Product Details */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-light text-base mb-1 truncate">
-                          {order.product.name}
-                        </h3>
-                        <p className="text-sm text-muted-foreground mb-3">
-                          {order.product.description?.substring(0, 80)}
-                          {order.product.description && order.product.description.length > 80 ? "..." : ""}
-                        </p>
-                        <div className="flex flex-wrap gap-4 text-sm">
-                          <div>
-                            <span className="text-muted-foreground">Quantity:</span>{" "}
-                            <span className="font-light">{order.quantity}</span>
-                          </div>
-                          {order.product.price && (
-                            <div>
-                              <span className="text-muted-foreground">Price:</span>{" "}
-                              <span className="font-light">
-                                {formatPrice(order.product.price)}
-                              </span>
-                            </div>
-                          )}
+          <div className="space-y-6 md:space-y-8">
+            {orders.map((order) => {
+              const statusConfig = getStatusConfig(order.status);
+              
+              return (
+                <div
+                  key={order.id}
+                  className="border border-border hover:border-foreground/30 transition-colors duration-300 bg-background"
+                >
+                  {/* Order Header */}
+                  <div className="px-6 md:px-8 py-5 border-b border-border bg-muted/20">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                      {/* Order Info */}
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-1.5 font-medium">
+                            Order
+                          </p>
+                          <p className="font-light text-sm">#{order.id}</p>
+                        </div>
+                        <div className="hidden sm:block w-px h-10 bg-border"></div>
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-1.5 font-medium">
+                            Placed On
+                          </p>
+                          <p className="font-light text-sm">
+                            {formatDate(order.createdAt)}
+                          </p>
+                        </div>
+                        <div className="hidden sm:block w-px h-10 bg-border"></div>
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-1.5 font-medium">
+                            Total Amount
+                          </p>
+                          <p className="font-normal text-sm">
+                            {formatPrice(order.totalPrice)}
+                          </p>
                         </div>
                       </div>
 
-                      {/* Order Total */}
-                      <div className="text-right shrink-0">
-                        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
-                          Total
-                        </p>
-                        <p className="text-lg font-light">
-                          {formatPrice(order.totalPrice)}
-                        </p>
+                      {/* Order Status Badge */}
+                      <div className={`inline-flex items-center gap-2 px-4 py-2 border rounded-none text-xs tracking-wider uppercase ${statusConfig.color}`}>
+                        {statusConfig.icon}
+                        <span className="font-medium">{statusConfig.label}</span>
                       </div>
                     </div>
-                  )}
+                  </div>
 
-                  {/* Order Footer */}
-                  <div className="mt-6 pt-6 border-t border-gray-100 flex justify-between items-center">
-                    <div className="text-xs text-muted-foreground">
-                      Razorpay Order ID:{" "}
-                      <span className="font-mono text-[10px]">
-                        {order.razorpayOrderId}
-                      </span>
+                  {/* Order Items */}
+                  <div className="p-6 md:p-8">
+                    {order.product && (
+                      <div className="flex gap-6 md:gap-8">
+                        {/* Product Image */}
+                        <Link 
+                          to={`/product/${order.product.id}`}
+                          className="group shrink-0"
+                        >
+                          <div className="w-24 h-32 md:w-28 md:h-36 bg-muted overflow-hidden">
+                            {order.product.img ? (
+                              <img
+                                src={order.product.img}
+                                alt={order.product.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Package className="h-10 w-10 text-muted-foreground/30" strokeWidth={1} />
+                              </div>
+                            )}
+                          </div>
+                        </Link>
+
+                        {/* Product Details */}
+                        <div className="flex-1 min-w-0">
+                          <Link 
+                            to={`/product/${order.product.id}`}
+                            className="block group"
+                          >
+                            <h3 className="font-light text-base md:text-lg mb-2 group-hover:text-muted-foreground transition-colors">
+                              {order.product.name}
+                            </h3>
+                          </Link>
+                          
+                          {order.product.description && (
+                            <p className="text-sm text-muted-foreground/80 mb-4 line-clamp-2 leading-relaxed">
+                              {order.product.description}
+                            </p>
+                          )}
+
+                          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Qty</span>
+                              <span className="font-light">{order.quantity}</span>
+                            </div>
+                            {order.product.price && (
+                              <div className="flex items-baseline gap-2">
+                                <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Unit Price</span>
+                                <span className="font-light">
+                                  {formatPrice(order.product.price)}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Order Footer Actions */}
+                    <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="text-xs text-muted-foreground/70">
+                        <span className="uppercase tracking-wider text-[10px]">Payment ID:</span>{" "}
+                        <span className="font-mono text-[10px] ml-1">
+                          {order.razorpayOrderId}
+                        </span>
+                      </div>
+                      
+                      <div className="flex gap-3">
+                        <Button
+                          variant="outline"
+                          className="rounded-none h-10 px-6 text-[11px] tracking-widest uppercase border-foreground/20 hover:border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
+                          asChild
+                        >
+                          <Link to={`/product/${order.product?.id}`}>
+                            View Product
+                          </Link>
+                        </Button>
+                        <Button
+                          className="rounded-none h-10 px-6 text-[11px] tracking-widest uppercase bg-foreground hover:bg-foreground/90 text-background"
+                          asChild
+                        >
+                          <Link to={`/orders/${order.id}`}>
+                            Order Details
+                            <ArrowRight className="ml-2 h-3.5 w-3.5" />
+                          </Link>
+                        </Button>
+                      </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      className="rounded-none h-9 px-6 text-xs tracking-widest uppercase border-black hover:bg-black hover:text-white transition-colors"
-                      asChild
-                    >
-                      <Link to={`/orders/${order.id}`}>View Details</Link>
-                    </Button>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
+          </div>
+        )}
+
+        {/* Help Section */}
+        {!isEmpty && (
+          <div className="mt-16 pt-12 border-t border-border text-center">
+            <p className="text-sm text-muted-foreground mb-4">
+              Need help with your order?
+            </p>
+            <Button
+              variant="ghost"
+              className="rounded-none h-10 px-6 text-xs tracking-widest uppercase hover:bg-muted"
+              asChild
+            >
+              <Link to="/contact">
+                Contact Support
+                <ArrowRight className="ml-2 h-3.5 w-3.5" />
+              </Link>
+            </Button>
           </div>
         )}
       </div>

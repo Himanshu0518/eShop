@@ -12,6 +12,7 @@ import Accessories from "@/pages/Accessories";
 import NewArrivals from "@/pages/NewArrivals";
 import Product from "./Product";
 import About from "./About";
+import OrderedProduct from "./OrderedProduct";
 
 export {  
   Home,
@@ -27,5 +28,6 @@ export {
     Accessories,
     NewArrivals,
     Product,
-    About
+    About,
+    OrderedProduct
 };

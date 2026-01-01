@@ -15,7 +15,8 @@ import {
   Accessories,
   NewArrivals,
   Product,
-  About
+  About,
+  OrderedProduct,
 } from "@/pages";
 
 const router = createBrowserRouter([
@@ -27,7 +28,6 @@ const router = createBrowserRouter([
       {
         element: <AuthLayout authentication={true} />,
         children: [
-          
           {
             path: "cart",
             element: <Cart />,
@@ -40,15 +40,18 @@ const router = createBrowserRouter([
             path: "orders",
             element: <Orders />,
           },
-
+          {
+            path: "orders/:orderId",
+            element: <OrderedProduct />,
+          },
         ],
       },
 
       // Public routes (no authentication required)
       {
-            index: true,
-            element: <Home />,
-          },
+        index: true,
+        element: <Home />,
+      },
       {
         path: "category/men",
         element: <Men />,
@@ -70,8 +73,8 @@ const router = createBrowserRouter([
         element: <Contact />,
       },
       {
-    path:"/about",
-    element: <About/>
+        path: "/about",
+        element: <About />,
       },
       {
         path: "new-arrivals",
@@ -81,7 +84,7 @@ const router = createBrowserRouter([
         path: "products",
         element: <NewArrivals />,
       },
-       {
+      {
         path: "product/:productId",
         element: <Product />,
       },
@@ -111,7 +114,6 @@ const router = createBrowserRouter([
   },
 
   // 404 Fallback
-  
 ]);
 
 export default router;
