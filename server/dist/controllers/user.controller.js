@@ -66,6 +66,7 @@ const LoginUser = (0, utils_1.asyncHandler)(async (req, res) => {
         const options = {
             httpOnly: true,
             secure: true,
+            sameSite: "none",
         };
         const user_db = await db_1.prisma.user.findUnique({
             where: { email: email },

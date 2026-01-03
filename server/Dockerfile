@@ -2,13 +2,15 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# copy everything (schema included)
+COPY package*.json ./
+COPY pnpm-lock.yaml ./
+
+RUN npm install -g pnpm && pnpm install --prod
+
 COPY . .
 
-# install deps (no prisma generate here)
-RUN npm install --omit=dev
+RUN pnpm build
 
 EXPOSE 8000
 
-# prisma generate + app start at RUNTIME
 CMD ["sh", "-c", "npx prisma generate && node dist/index.js"]

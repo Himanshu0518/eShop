@@ -10,7 +10,6 @@ const storage = multer_1.default.diskStorage({
         cb(null, "./public/temp");
     },
     filename: function (_, file, cb) {
-        console.log(file);
         cb(null, file.originalname);
     }
 });
