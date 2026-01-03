@@ -19,6 +19,7 @@ app.use(cookieParser());
 
 // THIRD: CORS - FIXED for deployment
 const allowedOrigins = [
+  'http://localhost',
   'http://localhost:5173',
   process.env.CLIENT_URL,
 ].filter(Boolean);

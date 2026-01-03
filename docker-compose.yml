@@ -60,9 +60,10 @@ services:
     restart: always
 
   frontend:
-    build:
-      context: ./client        #  frontend ka folder
-      dockerfile: Dockerfile   # (default hota hai, optional)
+    # build:
+    #   context: ./client        #  frontend ka folder
+    #   dockerfile: Dockerfile   # (default hota hai, optional)
+    image: himanshu0518/eshop_frontend:latest
     container_name: eshop_frontend
     ports:
       - "80:80"

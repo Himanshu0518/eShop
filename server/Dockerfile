@@ -1,16 +1,19 @@
-FROM node:22-alpine
+FROM node:22
 
 WORKDIR /app
 
-COPY package*.json ./
-COPY pnpm-lock.yaml ./
+# 1. Copy package files first (for caching)
+COPY package.json pnpm-lock.yaml ./
 
+# 2. Copy prisma folder and schema so postinstall works
+COPY prisma ./prisma
+
+# 3. Install dependencies
 RUN npm install -g pnpm && pnpm install --prod
 
+# 4. Copy the rest of the project
 COPY . .
 
-RUN pnpm build
-
+# 5. Expose port and start server
 EXPOSE 8000
-
-CMD ["sh", "-c", "npx prisma generate && node dist/index.js"]
+CMD ["node", "dist/index.js"]
