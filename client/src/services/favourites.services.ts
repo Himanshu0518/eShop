@@ -13,7 +13,7 @@ export const favouriteApi = createApi({
   tagTypes: ["Favorite"],
 
   baseQuery: fetchBaseQuery({
-      baseUrl: "/api",
+      baseUrl: "/api/favourites",
     credentials: "include",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");

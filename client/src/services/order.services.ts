@@ -15,7 +15,7 @@ export const orderApi = createApi({
   tagTypes: ["Order"],
 
   baseQuery: fetchBaseQuery({
-      baseUrl: "/api",
+      baseUrl: "/api/orders",
     credentials: "include",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
