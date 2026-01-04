@@ -10,18 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-
-      - name: Test SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: |
-             ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            whoami
-            pwd
-
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -44,15 +32,18 @@ jobs:
           docker push himanshu0518/eshop_frontend:latest
 
       - name: Deploy to EC2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: |
-           ${{ secrets.EC2_SSH_KEY }}
-          script: |
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          HOST: ${{ secrets.EC2_HOST }}
+          USER: ${{ secrets.EC2_USERNAME }}
+        run: |
+          echo "$PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER}@${HOST} '
             cd ~/eshop
             docker-compose pull
             docker-compose down
             docker-compose up -d
             docker system prune -af
+          '
+          rm -f private_key.pem
