@@ -14,7 +14,7 @@ export const cartApi = createApi({
   tagTypes: [ "Cart","Order"],
 
   baseQuery: fetchBaseQuery({
-    baseUrl: `${import.meta.env.VITE_CLIENT_BASE_URL}/api`,
+      baseUrl: "/api",
     credentials: "include",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");

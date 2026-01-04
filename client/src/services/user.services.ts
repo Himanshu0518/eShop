@@ -11,7 +11,7 @@ export const userApi = createApi({
   tagTypes: ["User", "Product", "Cart", "Order"],
 
   baseQuery: fetchBaseQuery({
-    baseUrl: `${import.meta.env.VITE_CLIENT_BASE_URL}/api`,
+     baseUrl: "/api",
     credentials: "include", // IMPORTANT for cookies
   }),
 
