@@ -8,8 +8,8 @@ const getApiBaseUrl = () => {
   const isDev = import.meta.env.DEV;
   
   // If VITE_API_URL is explicitly set (Vercel deployment), use it
-  if (import.meta.env.VITE_API_URL) {
-    return `${import.meta.env.VITE_API_URL}/api`;
+  if (import.meta.env.VITE_CLIENT_BASE_URL) {
+    return `${import.meta.env.VITE_CLIENT_BASE_URL}/api`;
   }
   
   // For development, use localhost
