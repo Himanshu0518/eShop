@@ -80,7 +80,7 @@ export default function NewArrivals() {
         )}
 
         {/* Empty State */}
-        {isSuccess && products.data.length === 0 && (
+        {isSuccess && (!products?.data || products.data.length === 0) && (
           <div className="flex items-center justify-center py-20">
             <div className="text-center space-y-4">
               <p className="text-lg text-muted-foreground">No products available yet</p>

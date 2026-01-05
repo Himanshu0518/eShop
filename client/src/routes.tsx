@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import RootLayout from "@/layout/RootLayout";
 import AuthLayout from "@/layout/AuthLayout";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import {
   Home,
   Cart,
@@ -23,10 +24,12 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
+    errorElement: <ErrorBoundary />,
     children: [
       // Protected routes (requires authentication)
       {
         element: <AuthLayout authentication={true} />,
+        errorElement: <ErrorBoundary />,
         children: [
           {
             path: "cart",
@@ -95,6 +98,7 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: <AuthLayout authentication={false} />,
+    errorElement: <ErrorBoundary />,
     children: [
       {
         index: true,
@@ -105,6 +109,7 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <AuthLayout authentication={false} />,
+    errorElement: <ErrorBoundary />,
     children: [
       {
         index: true,
@@ -112,8 +117,6 @@ const router = createBrowserRouter([
       },
     ],
   },
-
-  // 404 Fallback
 ]);
 
 export default router;
