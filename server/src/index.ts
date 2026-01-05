@@ -17,19 +17,29 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieParser());
 
-// THIRD: CORS - FIXED for deployment
+// THIRD: CORS - FIXED for both AWS and Render/Vercel
 const allowedOrigins = [
   'http://localhost',
   'http://localhost:5173',
-  process.env.CLIENT_URL,
+  'http://13.49.244.25', // AWS EC2 IP
+  'http://ec2-13-49-244-25.eu-north-1.compute.amazonaws.com', // AWS EC2 hostname
+  process.env.CLIENT_URL, // Vercel URL will come from env
 ].filter(Boolean);
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.some(allowed => origin?.startsWith(allowed))) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
- methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
-
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
 }));
 
 app.use(express.static("public"));
@@ -40,6 +50,10 @@ app.use(helmet({
 
 app.get('/', (_: Request, res: Response) => {
    res.status(200).json({ message: 'Server is running' });
+});
+
+app.get('/health', (_: Request, res: Response) => {
+   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // all routes will be here

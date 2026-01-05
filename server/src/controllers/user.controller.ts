@@ -65,10 +65,16 @@ const LoginUser = asyncHandler(async (req: Request, res: Response) => {
         }
        const accessToken = createAuthToken(String(existingUser.id));
         
+          // Cookie options - adapt based on environment
+          const isProduction = process.env.NODE_ENV === 'production';
+          const isHttps = process.env.CLIENT_URL?.startsWith('https');
+          
           const options: CookieOptions = {
             httpOnly: true,
-            secure: true,
-           sameSite: "none",
+            secure: isHttps, // Only secure if using HTTPS
+            sameSite: isHttps ? "none" : "lax", // 'none' only works with secure
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
           };
 
     const user_db = await prisma.user.findUnique({

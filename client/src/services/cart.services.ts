@@ -3,6 +3,7 @@ import type {
   CartResponse
 } from '@/types/cart.types';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { API_BASE_URL } from '@/lib/api-config';
 import type {
   CreateOrderPayload,
   OrderResponse
@@ -14,7 +15,7 @@ export const cartApi = createApi({
   tagTypes: [ "Cart","Order"],
 
   baseQuery: fetchBaseQuery({
-      baseUrl: "/api",
+  baseUrl: API_BASE_URL,
     credentials: "include",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");

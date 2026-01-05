@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { API_BASE_URL } from '@/lib/api-config';
 
 import type {
   Product,
@@ -14,7 +15,7 @@ export const productApi = createApi({
   tagTypes: ["Product", "ProductView"],
 
   baseQuery: fetchBaseQuery({
-      baseUrl: "/api",
+      baseUrl: API_BASE_URL,
     credentials: "include",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");

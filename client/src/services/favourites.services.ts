@@ -5,6 +5,7 @@ import type {
 } from '@/types/favourite.types';
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { API_BASE_URL } from '@/lib/api-config';
 
 
 export const favouriteApi = createApi({
@@ -13,7 +14,7 @@ export const favouriteApi = createApi({
   tagTypes: ["Favorite"],
 
   baseQuery: fetchBaseQuery({
-      baseUrl: "/api/favourites",
+      baseUrl: `${API_BASE_URL}/favourites`,
     credentials: "include",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
