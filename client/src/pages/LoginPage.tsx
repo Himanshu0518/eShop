@@ -28,6 +28,7 @@ function LoginPage() {
         description: "You have been logged in successfully",
       });
       dispatch(setUser(res));
+      localStorage.setItem("token", res.data.token);
       navigate("/", { replace: true });
     } catch (err: any) {
       console.error("Login failed:", err);

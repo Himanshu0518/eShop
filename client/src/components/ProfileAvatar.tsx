@@ -28,6 +28,7 @@ function ProfileAvatar() {
       toast.success("Logged out successfully!", {
         description: "See you next time",
       });
+      localStorage.removeItem("token")
       dispatch(setUser(null));
       navigate("/login", { replace: true });
     } catch (error) {

@@ -66,7 +66,7 @@ const LoginUser = asyncHandler(async (req: Request, res: Response) => {
        const accessToken = createAuthToken(String(existingUser.id));
         
           // Cookie options - adapt based on environment
-          const isProduction = process.env.NODE_ENV === 'production';
+         
           const isHttps = process.env.CLIENT_URL?.startsWith('https');
           
           const options: CookieOptions = {
