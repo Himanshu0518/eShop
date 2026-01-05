@@ -73,7 +73,7 @@ export default function NewArrivals() {
         {/* Products Grid */}
         {isSuccess && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
-            {products.data.slice(0, 8).map((product) => (
+            {products?.data?.slice(0, 8).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
