@@ -15,6 +15,7 @@ import { useAppSelector } from "@/store/authSlice";
 import {
   useCreateOrderMutation,
   useVerifyPaymentMutation,
+  useGetKeyQuery
 } from "@/services/order.services";
 
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ import { toast } from "sonner";
 function Product() {
   const { productId } = useParams();
   const navigate = useNavigate();
+  
 
   // Fetch all products first
   const { data: allProducts, isLoading: isLoadingProducts } =
@@ -47,7 +49,7 @@ function Product() {
 
   // Combine both sources
   const product = cachedProduct || detailedProduct?.data;
-
+ 
   const { data: recommendedData, isLoading: isLoadingRecommended } =
     useGetRecommendedByProductQuery(Number(productId));
   const recommendedProducts = recommendedData?.data;
@@ -67,6 +69,7 @@ function Product() {
   const [createOrder] = useCreateOrderMutation();
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [verifyPayment] = useVerifyPaymentMutation();
+ const { data: keyData } = useGetKeyQuery();
   // Track view when product ID changes
   useEffect(() => {
     if (productId && authStatus) {
@@ -105,9 +108,10 @@ function Product() {
       }).unwrap();
 
       console.log(order);
-
+      const key = keyData?.key ;
+      console.log(key)
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY,
+        key,
         amount: totalAmount, // Amount is in currency subunits.
         currency: "INR",
         name: "Acme Corp",

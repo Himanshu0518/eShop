@@ -44,12 +44,20 @@ const SignupUser = asyncHandler(async (req: Request, res: Response) => {
 
 const LoginUser = asyncHandler(async (req: Request, res: Response) => {
     const {email, password} = req.body;
+    if(!email || !password){
+       return res.status(500)
+        .json({
+                sucess:false ,
+                message:"email and password are required"
+            }
+        )}
     try{
         const existingUser = await prisma.user.findUnique({
             where:{
                 email:email
             }
         });
+        console.log(existingUser)
         if(!existingUser){
             return res.status(404).json({
                 success:false,

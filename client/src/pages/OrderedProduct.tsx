@@ -1,4 +1,4 @@
-import { useVerifyPaymentMutation, useGetOrdersQuery } from "@/services/order.services";
+import { useVerifyPaymentMutation, useGetOrdersQuery,useGetKeyQuery } from "@/services/order.services";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAppSelector } from "@/store/authSlice";
@@ -24,6 +24,7 @@ const OrderedProduct = () => {
 
   const { orderId } = useParams();
   const order = ordersData?.data?.find((order) => order.id === Number(orderId));
+ const { data: keyData } = useGetKeyQuery();
 
   const getStatusConfig = (status: string) => {
     const statusLower = status.toLowerCase();
@@ -99,8 +100,9 @@ const OrderedProduct = () => {
     if (!order) return;
 
     try {
+      const key = keyData?.key ;
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY,
+        key,
         amount: order.totalPrice * 100, // Convert to paise/cents
         currency: "INR",
         name: "eShop",

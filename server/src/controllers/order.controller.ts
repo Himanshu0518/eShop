@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import razorpay from "../config/payment";
 import crypto from "crypto";
 import { prisma } from "../config/db";
+import { request } from "http";
 
 
 const createOrder = asyncHandler(async (req: Request, res: Response) => {
@@ -148,5 +149,18 @@ const getAllOrders = asyncHandler(async (req: Request, res: Response) => {
     }
 })
 
+const getPaymentKey = asyncHandler(async(_,res:Response)=>{
 
-export {verifyPayment,createOrder , getAllOrders};
+
+   const key_id = process.env.RAZORPAY_KEY_ID 
+
+    return res.status(200)
+    .json({
+      key:key_id,
+      sucess:true,
+      message:'sucessfully received key'
+    })
+})
+
+
+export {verifyPayment,createOrder, getAllOrders, getPaymentKey };

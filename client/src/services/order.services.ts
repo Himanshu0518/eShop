@@ -3,7 +3,8 @@ import type {
   CreateOrderResponse,
   VerifyPaymentPayload,
   VerifyPaymentResponse,
-  OrderResponse
+  OrderResponse,
+  PaymentKeyResponse
 } from '@/types/order.types';
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
@@ -58,6 +59,9 @@ export const orderApi = createApi({
       providesTags: ["Order"]
     }),
     
+    getKey: builder.query<PaymentKeyResponse, void>({
+      query: () => '/getKey',    
+    }),
 
   }),    
 });
@@ -66,5 +70,6 @@ export const orderApi = createApi({
 export const {
    useCreateOrderMutation,
    useVerifyPaymentMutation,
-   useGetOrdersQuery
+   useGetOrdersQuery,
+   useGetKeyQuery
 } = orderApi ;

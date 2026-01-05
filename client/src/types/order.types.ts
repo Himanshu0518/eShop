@@ -74,3 +74,9 @@ export interface OrderResponse {
   message: string;
   data: Order[];
 }
+
+export interface PaymentKeyResponse{
+  success: boolean;
+  message: string;
+  key:string 
+}
