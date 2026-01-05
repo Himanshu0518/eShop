@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "https://eshop-t7by.onrender.com"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }

@@ -46,7 +46,6 @@ Two search modes for maximum flexibility:
 ### Design & UX
 - **Minimalist Interface** - Clean, modern design inspired by premium e-commerce sites
 - **Fully Responsive** - Seamless experience across mobile, tablet, and desktop
-- **Dark/Light Mode** - System-aware theme switching
 - **Fast Performance** - Optimized loading and smooth interactions
 
 ## 🛠️ Technology Stack
@@ -310,14 +309,6 @@ pnpm build
 cd server
 pnpm start
 ```
-
-
-## 🐛 Known Issues & Future Improvements
-
-### Current Limitations
-- Embedding generation requires Gemini API (rate limits apply)
-- Payment gateway integration is simulated
-- Search is limited to product name and description
 
 
 

@@ -20,10 +20,15 @@ const createOrder = asyncHandler(async (req: Request, res: Response) => {
 
   try {
     // 1️ Create Razorpay order
-    const razorpayOrder = await razorpay.orders.create({
-      amount: Number(totalAmount) * 100*USD_TO_INR , // paise
-      currency: "INR",
-    });
+    const amountInPaise = Math.round(
+  Number(totalAmount) * USD_TO_INR * 100
+);
+
+const razorpayOrder = await razorpay.orders.create({
+  amount: amountInPaise,
+  currency: "INR",
+});
+
 
     // 2️ Create DB order linked with Razorpay order
     const dbOrder = await prisma.order.create({
@@ -54,7 +59,7 @@ const createOrder = asyncHandler(async (req: Request, res: Response) => {
 
     return res.status(500).json({
       success: false,
-      message: `Something went wrong: ${error.message}`,
+      message: `Something went wrong: ${error}`,
     });
   }
 });
