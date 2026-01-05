@@ -1,19 +1,32 @@
+# ---------- BUILD STAGE ----------
+FROM node:22 AS builder
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml ./
+COPY prisma ./prisma
+
+RUN npm install -g pnpm && pnpm install
+
+COPY . .
+
+# Build TypeScript → dist
+RUN pnpm build
+
+
+# ---------- PRODUCTION STAGE ----------
 FROM node:22
 
 WORKDIR /app
 
-# 1. Copy package files first (for caching)
 COPY package.json pnpm-lock.yaml ./
-
-# 2. Copy prisma folder and schema so postinstall works
 COPY prisma ./prisma
 
-# 3. Install dependencies
 RUN npm install -g pnpm && pnpm install --prod
 
-# 4. Copy the rest of the project
-COPY . .
+# Copy only built output
+COPY --from=builder /app/dist ./dist
 
-# 5. Expose port and start server
 EXPOSE 8000
+
 CMD ["node", "dist/index.js"]
