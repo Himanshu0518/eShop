@@ -41,7 +41,7 @@ eShop/
 
 ```bash
 cd server
-docker build -t himanshu0518/backend:latest .
+docker build -t himanshu0518/eshop_backend:latest .
 ```
 
 **What happens:**
@@ -55,7 +55,7 @@ docker build -t himanshu0518/backend:latest .
 
 ```bash
 cd client
-docker build -t himanshu0518/frontend:latest .
+docker build -t himanshu0518/eshop_frontend:latest .
 ```
 
 **What happens:**
@@ -155,20 +155,20 @@ docker login
 
 ```bash
 # Backend
-docker tag eshop_backend himanshu0518/backend:latest
+docker tag eshop_backend himanshu0518/eshop_backend:latest
 
 # Frontend
-docker tag eshop_frontend himanshu0518/frontend:latest
+docker tag eshop_frontend himanshu0518/eshop_frontend:latest
 ```
 
 ### **Push Images**
 
 ```bash
 # Push backend
-docker push himanshu0518/backend:latest
+docker push himanshu0518/eshop_backend:latest
 
 # Push frontend
-docker push himanshu0518/frontend:latest
+docker push himanshu0518/eshop_frontend:latest
 ```
 
 ### **Push with Version Tag**

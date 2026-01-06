@@ -1,9 +1,17 @@
 # eShop - AI-Powered E-Commerce Platform
 
 A production-ready full-stack e-commerce application featuring advanced AI-powered product recommendations, semantic search capabilities, and intelligent browsing history. Built as an academic project showcasing modern web development practices and cutting-edge AI integration.
+This project demonstrates end-to-end application design, containerized deployments, CI/CD automation, and scalable cloud infrastructure using AWS.
 
-[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://your-demo-link.com)
+[![Vercel Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://e-shop-virid.vercel.app/)
+[![AWS Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](http://13.49.244.25/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+> ⚠️ **Educational Project Notice**
+>
+> This project was built **strictly for educational and academic purposes**.  
+> The live aws deployment may be **modified or taken down in the future** to manage infrastructure costs.
+
 
 ## 🌟 Key Features
 
@@ -75,6 +83,24 @@ Two search modes for maximum flexibility:
 - **Vector Embeddings** - 512-dimensional product representations
 - **Cosine Similarity** - Semantic matching algorithm
 - **pgvector** - High-performance vector operations in PostgreSQL
+
+## ☁️ Deployment & Infrastructure
+
+This application is also **fully containerized and deployed on AWS** using modern DevOps practices.
+
+### Deployment Stack
+- **AWS EC2** – Hosting the production server
+- **Docker** – Containerization of frontend and backend services
+- **Docker Compose** – Multi-container orchestration
+- **Nginx** – Reverse proxy and static file serving
+
+### Deployment Architecture
+- Frontend (React) served via **Nginx**
+- Backend (Node.js + Express) running in a separate container
+- PostgreSQL hosted on **Neon (managed PostgreSQL)**
+- All services orchestrated using **docker-compose**
+
+> The application follows a production-grade setup similar to real-world SaaS deployments.
 
 
 ## 🏗️ Project Architecture
@@ -354,6 +380,13 @@ Special thanks to:
 - **Tailwind Labs** - For the powerful utility-first CSS framework
 - **PostgreSQL Community** - For the pgvector extension
 - **Prisma Team** - For the excellent ORM and developer experience
+
+## 📌 Important Note
+
+This project is maintained as a **learning and portfolio project**.  
+The live deployment and cloud resources may be **paused or removed at any time** to reduce ongoing costs.
+
+If the live demo is unavailable, the complete source code and setup instructions remain fully accessible in this repository.
 
 ## 📞 Support & Feedback
 
