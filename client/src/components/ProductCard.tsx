@@ -86,7 +86,7 @@ function ProductCard({ product }: ProductCardProps) {
   const handleToggleFavourite = async (
     e: React.MouseEvent,
     productId: number,
-    productName: string
+    
   ) => {
     e.preventDefault();
     e.stopPropagation();
@@ -161,7 +161,7 @@ function ProductCard({ product }: ProductCardProps) {
                   variant="secondary"
                   className="rounded-full h-12 w-12 shadow-lg hover:scale-110 transition-transform bg-white hover:bg-white"
                   onClick={(e) =>
-                    handleToggleFavourite(e, product.id, product.name)
+                    handleToggleFavourite(e, product.id)
                   }
                   disabled={loadingStates[product.id]?.fav}
                 >
@@ -201,7 +201,7 @@ function ProductCard({ product }: ProductCardProps) {
                   variant="secondary"
                   className="rounded-full h-10 w-10 shadow-lg bg-white/95 hover:bg-white backdrop-blur-sm"
                   onClick={(e) =>
-                    handleToggleFavourite(e, product.id, product.name)
+                    handleToggleFavourite(e, product.id)
                   }
                   disabled={loadingStates[product.id]?.fav}
                 >
