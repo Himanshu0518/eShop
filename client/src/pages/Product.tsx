@@ -5,27 +5,34 @@ import {
   useGetRecommendedByProductQuery,
 } from "@/services/product.services";
 import { useAddToCartMutation } from "@/services/cart.services";
-import { useToggleFavouriteMutation } from "@/services/favourites.services";
+import {
+  useToggleFavouriteMutation,
+  useGetFavoritesQuery,
+} from "@/services/favourites.services";
 import { useState, useEffect } from "react";
-import { Heart, ShoppingCart, ArrowLeft, Check, ScanBarcodeIcon } from "lucide-react";
+import {
+  Heart,
+  ShoppingCart,
+  ArrowLeft,
+  Check,
+  ScanBarcodeIcon,
+} from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { useAddViewMutation } from "@/services/product.services";
 import ProductCard from "@/components/ProductCard";
 import { useAppSelector } from "@/store/authSlice";
+import { skipToken } from "@reduxjs/toolkit/query";
 import {
   useCreateOrderMutation,
   useVerifyPaymentMutation,
-  useGetKeyQuery
+  useGetKeyQuery,
 } from "@/services/order.services";
 
 import { toast } from "sonner";
 
-
-
 function Product() {
   const { productId } = useParams();
   const navigate = useNavigate();
-  
 
   // Fetch all products first
   const { data: allProducts, isLoading: isLoadingProducts } =
@@ -37,6 +44,7 @@ function Product() {
   );
   const authStatus = useAppSelector((state) => state.auth.status);
   const user = useAppSelector((state) => state.auth.user);
+
   const calculateNetPrice = (price: number, discount: number) => {
     return price - (price * discount) / 100;
   };
@@ -49,13 +57,10 @@ function Product() {
 
   // Combine both sources
   const product = cachedProduct || detailedProduct?.data;
- 
+
   const { data: recommendedData, isLoading: isLoadingRecommended } =
     useGetRecommendedByProductQuery(Number(productId));
   const recommendedProducts = recommendedData?.data;
-
-  // Determine overall loading state
-  const isLoading = isLoadingProducts || isLoadingDetail;
 
   // Determine if product exists
   const hasProduct = !!product;
@@ -69,13 +74,24 @@ function Product() {
   const [createOrder] = useCreateOrderMutation();
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [verifyPayment] = useVerifyPaymentMutation();
- const { data: keyData } = useGetKeyQuery();
+  const { data: keyData } = useGetKeyQuery();
+  const { data: favouriteProducts, isLoading: loadingFav } =
+    useGetFavoritesQuery(authStatus ? undefined : skipToken);
+
+  // Determine overall loading state
+  const isLoading = isLoadingProducts || isLoadingDetail || loadingFav;
+
   // Track view when product ID changes
   useEffect(() => {
     if (productId && authStatus) {
       addView(Number(productId));
     }
   }, [productId, addView, authStatus]);
+
+  useEffect(() => {
+    const isFav = favouriteProducts?.data?.some((fav) => fav.id === product?.id);
+    setIsFavorite(!!isFav);
+  }, [favouriteProducts, product?.id]);
 
   const handleAddToCart = async () => {
     try {
@@ -92,9 +108,9 @@ function Product() {
 
   const handleCreateOrder = async () => {
     setIsCreatingOrder(true);
-     
-    if(!authStatus){
-      navigate('/login')
+
+    if (!authStatus) {
+      navigate("/login");
     }
     try {
       const totalAmount = calculateNetPrice(
@@ -108,8 +124,8 @@ function Product() {
       }).unwrap();
 
       console.log(order);
-      const key = keyData?.key ;
-      console.log(key)
+      const key = keyData?.key;
+      console.log(key);
       const options = {
         key,
         amount: totalAmount, // Amount is in currency subunits.
@@ -140,7 +156,7 @@ function Product() {
           email: user?.data.email,
         },
         theme: {
-           color: "#000000",
+          color: "#000000",
         },
       };
 
@@ -156,7 +172,8 @@ function Product() {
   const handleToggleFavorite = async () => {
     try {
       await toggleFavorite({ productId: Number(productId) }).unwrap();
-      setIsFavorite(!isFavorite);
+      const newFavState = !isFavorite;
+      setIsFavorite(newFavState);
     } catch (error) {
       console.error("Failed to toggle favorite:", error);
     }
@@ -323,7 +340,7 @@ function Product() {
                   </>
                 ) : isAddingToCart ? (
                   <>
-                  <Spinner />
+                    <Spinner />
                   </>
                 ) : (
                   <>
@@ -341,7 +358,6 @@ function Product() {
                 {isCreatingOrder ? (
                   <>
                     <Spinner />
-
                   </>
                 ) : (
                   <>
@@ -356,11 +372,11 @@ function Product() {
                 className="w-full h-12 border border-gray-300 hover:border-black text-black rounded-none text-xs font-light tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70"
               >
                 <Heart
-                  className={`h-4 w-4 transition-all ${
-                    isFavorite ? "fill-black text-black" : "text-gray-600"
+                  className={`h-5 w-5 transition-all stroke-2 ${
+                    isFavorite ? "fill-red-500 text-red-500" : "text-gray-700"
                   }`}
                 />
-                {isFavorite ? "Saved" : "Save to Wishlist"}
+                {isFavorite ? "Saved to Wishlist" : "Save to Wishlist"}
               </button>
             </div>
 

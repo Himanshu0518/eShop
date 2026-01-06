@@ -5,8 +5,15 @@ import { Link } from "react-router-dom";
 import { useGetCartQuery, useUpdateQuantityMutation, useRemoveFromCartMutation } from "@/services/cart.services";
 import Spinner from "@/components/Spinner";
 import { BiError } from "react-icons/bi";
+import { skipToken } from '@reduxjs/toolkit/query';
+import { useAppSelector } from "@/store/authSlice";
+
 function Cart() {
-  const { data: cartItems, isLoading, isError, isSuccess } = useGetCartQuery();
+
+  const authStatus = useAppSelector((state)=> state.auth.status)
+  const { data: cartItems, isLoading, isError, isSuccess } = useGetCartQuery(
+    authStatus ? undefined : skipToken
+  );
   const [updateQuantity, { isLoading: isUpdating }] = useUpdateQuantityMutation();
   const [removeFromCart, { isLoading: isRemoving }] = useRemoveFromCartMutation();
   const [removingItemId, setRemovingItemId] = useState<number | null>(null);

@@ -1,27 +1,40 @@
 import { Heart, ShoppingCart } from "lucide-react";
 import { useAddToCartMutation } from "@/services/cart.services";
-import { useToggleFavouriteMutation } from "@/services/favourites.services";
+import {
+  useToggleFavouriteMutation,
+  useGetFavoritesQuery,
+} from "@/services/favourites.services";
 import { useAppSelector } from "@/store/authSlice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import Spinner from "./Spinner";
 import type { Product } from "@/types/product.types";
-
+import { skipToken } from "@reduxjs/toolkit/query";
 
 interface ProductCardProps {
   product: Product;
 }
 
-
 function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
-  const  currentUser = useAppSelector((state) => state.auth.user);
+  const currentUser = useAppSelector((state) => state.auth.user);
+  const authStatus = useAppSelector((state) => state.auth.status);
   const isLoggedIn = !!currentUser?.data;
 
   const [addToCart] = useAddToCartMutation();
   const [toggleFavourite] = useToggleFavouriteMutation();
+  const { data: favouriteProducts, isLoading } = useGetFavoritesQuery(
+    authStatus ? undefined : skipToken
+  );
+
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    const isFav = favouriteProducts?.data?.some((fav) => fav.id === product.id);
+    setIsFavorite(!!isFav);
+  }, [favouriteProducts, product.id]);
 
   const [loadingStates, setLoadingStates] = useState<{
     [key: number]: { cart: boolean; fav: boolean };
@@ -93,11 +106,19 @@ function ProductCard({ product }: ProductCardProps) {
     }));
 
     try {
+      const newFavState = !isFavorite;
+      setIsFavorite(newFavState);
+
       await toggleFavourite({ productId }).unwrap();
-      toast.success(`${productName} added to favourites!`, {
-        description: "View your favourites anytime",
-      });
+
+      toast.success(
+        newFavState
+          ? `${productName} added to favourites!`
+          : `${productName} removed from favourites!`
+      );
     } catch (error: any) {
+      // Revert on error
+      setIsFavorite(!newFavState);
       toast.error("Failed to update favourites", {
         description: error?.data?.message || "Please try again",
       });
@@ -108,6 +129,14 @@ function ProductCard({ product }: ProductCardProps) {
       }));
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="group relative">
@@ -127,7 +156,7 @@ function ProductCard({ product }: ProductCardProps) {
                 <Button
                   size="icon"
                   variant="secondary"
-                  className="rounded-full h-12 w-12 shadow-lg hover:scale-110 transition-transform"
+                  className="rounded-full h-12 w-12 shadow-lg hover:scale-110 transition-transform bg-white hover:bg-white"
                   onClick={(e) =>
                     handleToggleFavourite(e, product.id, product.name)
                   }
@@ -136,20 +165,26 @@ function ProductCard({ product }: ProductCardProps) {
                   {loadingStates[product.id]?.fav ? (
                     <Spinner className="h-5 w-5" />
                   ) : (
-                    <Heart className="h-5 w-5" />
+                    <Heart
+                      className={`h-5 w-5 transition-all ${
+                        isFavorite 
+                          ? "fill-red-500 text-red-500 stroke-2" 
+                          : "text-gray-700 stroke-2"
+                      }`}
+                    />
                   )}
                 </Button>
                 <Button
                   size="icon"
                   variant="secondary"
-                  className="rounded-full h-12 w-12 shadow-lg hover:scale-110 transition-transform"
+                  className="rounded-full h-12 w-12 shadow-lg hover:scale-110 transition-transform bg-white hover:bg-white"
                   onClick={(e) => handleAddToCart(e, product.id, product.name)}
                   disabled={loadingStates[product.id]?.cart}
                 >
                   {loadingStates[product.id]?.cart ? (
                     <Spinner className="h-5 w-5" />
                   ) : (
-                    <ShoppingCart className="h-5 w-5" />
+                    <ShoppingCart className="h-5 w-5 text-gray-700 stroke-2" />
                   )}
                 </Button>
               </div>
@@ -161,7 +196,7 @@ function ProductCard({ product }: ProductCardProps) {
                 <Button
                   size="icon"
                   variant="secondary"
-                  className="rounded-full h-9 w-9 shadow-md bg-white/90 hover:bg-white backdrop-blur-sm"
+                  className="rounded-full h-10 w-10 shadow-lg bg-white/95 hover:bg-white backdrop-blur-sm"
                   onClick={(e) =>
                     handleToggleFavourite(e, product.id, product.name)
                   }
@@ -170,20 +205,26 @@ function ProductCard({ product }: ProductCardProps) {
                   {loadingStates[product.id]?.fav ? (
                     <Spinner className="h-4 w-4" />
                   ) : (
-                    <Heart className="h-4 w-4" />
+                    <Heart
+                      className={`h-4.5 w-4.5 transition-all ${
+                        isFavorite 
+                          ? "fill-red-500 text-red-500 stroke-2" 
+                          : "text-gray-700 stroke-2"
+                      }`}
+                    />
                   )}
                 </Button>
                 <Button
                   size="icon"
                   variant="secondary"
-                  className="rounded-full h-9 w-9 shadow-md bg-white/90 hover:bg-white backdrop-blur-sm"
+                  className="rounded-full h-10 w-10 shadow-lg bg-white/95 hover:bg-white backdrop-blur-sm"
                   onClick={(e) => handleAddToCart(e, product.id, product.name)}
                   disabled={loadingStates[product.id]?.cart}
                 >
                   {loadingStates[product.id]?.cart ? (
                     <Spinner className="h-4 w-4" />
                   ) : (
-                    <ShoppingCart className="h-4 w-4" />
+                    <ShoppingCart className="h-4.5 w-4.5 text-gray-700 stroke-2" />
                   )}
                 </Button>
               </div>

@@ -9,9 +9,15 @@ import {
 import { useAddToCartMutation } from "@/services/cart.services";
 import Spinner from "@/components/Spinner";
 import { BiError } from "react-icons/bi";
+import { useAppSelector } from "@/store/authSlice";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 function Favourite() {
-  const { data: favorites, isLoading, isError, isSuccess } = useGetFavoritesQuery();
+  const authStatus = useAppSelector((state)=> state.auth.status)
+
+  const { data: favorites, isLoading, isError, isSuccess } = useGetFavoritesQuery(
+    authStatus ? undefined : skipToken
+  );
   const [removeFromFavorite, { isLoading: isRemoving }] = useRemoveFromFavoriteMutation();
   const [addToCart] = useAddToCartMutation();
   const [removingItemId, setRemovingItemId] = useState<number | null>(null);

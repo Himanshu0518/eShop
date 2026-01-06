@@ -2,13 +2,19 @@ import { Button } from "@/components/ui/button";
 import { Package, ArrowRight, Clock, CheckCircle2, Truck, XCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGetOrdersQuery } from "@/services/order.services";
+import { useAppSelector } from "@/store/authSlice";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 function Orders() {
-  const { data: ordersData, isLoading, isError } = useGetOrdersQuery();
+  const authStatus=useAppSelector((state) => state.auth.status);
+
+  const { data: ordersData, isLoading, isError } = useGetOrdersQuery(
+    authStatus ? undefined : skipToken
+  );
   
   const orders = ordersData?.data || [];
   const isEmpty = orders.length === 0;
-
+  
   const getStatusConfig = (status: string) => {
     const statusLower = status.toLowerCase();
     switch (statusLower) {
