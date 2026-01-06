@@ -85,6 +85,9 @@ const toggleFavourite = asyncHandler(async (req, res) => {
                 userId: userId,
                 productId: Number(productId),
             },
+            include:{
+                product:true 
+            }
         });
         if (existingFavourite) {
             await prisma.favorite.delete({
@@ -94,7 +97,7 @@ const toggleFavourite = asyncHandler(async (req, res) => {
             });
             return res.status(200).json({
                 success: true,
-                message: "Item removed from favorite successfully",
+                message: `${existingFavourite.product.name} removed from favorites successfully`,
             });
         } else {
             await prisma.favorite.create({
@@ -105,7 +108,7 @@ const toggleFavourite = asyncHandler(async (req, res) => {
             });
             return res.status(200).json({
                 success: true,
-                message: "Item added to favorite successfully",
+                message: `${existingFavourite.product.name} added to favorites successfully`,
             });
         }
     } catch (error) {

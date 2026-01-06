@@ -32,9 +32,11 @@ function ProductCard({ product }: ProductCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
-    const isFav = favouriteProducts?.data?.some((fav) => fav.id === product.id);
-    setIsFavorite(!!isFav);
-  }, [favouriteProducts, product.id]);
+    if (favouriteProducts?.data && product?.id) {
+      const isFav = favouriteProducts.data.some((fav) => fav.id === product.id);
+      setIsFavorite(!!isFav);
+    }
+  }, [favouriteProducts?.data, product?.id]);
 
   const [loadingStates, setLoadingStates] = useState<{
     [key: number]: { cart: boolean; fav: boolean };
@@ -105,20 +107,21 @@ function ProductCard({ product }: ProductCardProps) {
       [productId]: { ...prev[productId], fav: true },
     }));
 
+    // Store the current state before toggling
+    const previousFavState = isFavorite;
+    const newFavState = !previousFavState;
+
     try {
-      const newFavState = !isFavorite;
+      // Optimistically update UI
       setIsFavorite(newFavState);
 
-      await toggleFavourite({ productId }).unwrap();
+      const response = await toggleFavourite({ productId }).unwrap();
 
-      toast.success(
-        newFavState
-          ? `${productName} added to favourites!`
-          : `${productName} removed from favourites!`
-      );
+      // Show appropriate toast based on new state
+      toast.success(response.message);
     } catch (error: any) {
-      // Revert on error
-      setIsFavorite(!newFavState);
+      // Revert to previous state on error
+      setIsFavorite(previousFavState);
       toast.error("Failed to update favourites", {
         description: error?.data?.message || "Please try again",
       });
@@ -167,8 +170,8 @@ function ProductCard({ product }: ProductCardProps) {
                   ) : (
                     <Heart
                       className={`h-5 w-5 transition-all ${
-                        isFavorite 
-                          ? "fill-red-500 text-red-500 stroke-2" 
+                        isFavorite
+                          ? "fill-gray-700 text-gray-700 stroke-2" // Changed from red to gray
                           : "text-gray-700 stroke-2"
                       }`}
                     />
@@ -207,8 +210,8 @@ function ProductCard({ product }: ProductCardProps) {
                   ) : (
                     <Heart
                       className={`h-4.5 w-4.5 transition-all ${
-                        isFavorite 
-                          ? "fill-red-500 text-red-500 stroke-2" 
+                        isFavorite
+                          ? "fill-gray-700 text-gray-700 stroke-2" // Changed from red to gray
                           : "text-gray-700 stroke-2"
                       }`}
                     />

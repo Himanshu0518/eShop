@@ -89,9 +89,11 @@ function Product() {
   }, [productId, addView, authStatus]);
 
   useEffect(() => {
-    const isFav = favouriteProducts?.data?.some((fav) => fav.id === product?.id);
-    setIsFavorite(!!isFav);
-  }, [favouriteProducts, product?.id]);
+    if (favouriteProducts?.data && product?.id) {
+      const isFav = favouriteProducts.data.some((fav) => fav.id === product.id);
+      setIsFavorite(!!isFav);
+    }
+  }, [favouriteProducts?.data, product?.id]);
 
   const handleAddToCart = async () => {
     try {
@@ -100,7 +102,7 @@ function Product() {
         quantity,
       }).unwrap();
       setAddedToCart(true);
-      setTimeout(() => setAddedToCart(false), 2000);
+      
     } catch (error) {
       console.error("Failed to add to cart:", error);
     }
@@ -170,11 +172,35 @@ function Product() {
   };
 
   const handleToggleFavorite = async () => {
+    if (!authStatus) {
+      toast.error("Please login to add items to favourites", {
+        description: "You'll be redirected to login page",
+        action: {
+          label: "Login",
+          onClick: () => navigate("/login"),
+        },
+      });
+      return;
+    }
+
+    // Store the current state before toggling
+    const previousFavState = isFavorite;
+    const newFavState = !previousFavState;
+
     try {
-      await toggleFavorite({ productId: Number(productId) }).unwrap();
-      const newFavState = !isFavorite;
+      // Optimistically update UI
       setIsFavorite(newFavState);
-    } catch (error) {
+
+     const response = await toggleFavorite({ productId: Number(productId) }).unwrap();
+
+      // Show appropriate toast based on new state
+      toast.success(response.message);
+    } catch (error: any) {
+      // Revert to previous state on error
+      setIsFavorite(previousFavState);
+      toast.error("Failed to update favourites", {
+        description: error?.data?.message || "Please try again",
+      });
       console.error("Failed to toggle favorite:", error);
     }
   };

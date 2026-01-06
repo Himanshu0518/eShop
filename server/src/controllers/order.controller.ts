@@ -157,8 +157,8 @@ const getPaymentKey = asyncHandler(async(_,res:Response)=>{
     return res.status(200)
     .json({
       key:key_id,
-      sucess:true,
-      message:'sucessfully received key'
+      success:true,
+      message:'successfully received key'
     })
 })
 
