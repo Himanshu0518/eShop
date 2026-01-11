@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+
 export interface User {
   id: number;
   email: string;
@@ -6,6 +9,10 @@ export interface User {
   isAdmin: boolean;
   createdAt: string;
   updatedAt: string;
+  cartItems? :  any[]
+  orders  ? :    any[]
+  ProductViews ? : any[]
+  favorites ? :    any[]
 }
 
 export interface SignupPayload {
@@ -41,4 +48,11 @@ export interface ApiError {
     message: string;
     errors?: Record<string, string>;
   };
+}
+
+
+export interface AllUserResponse {
+    success: boolean;
+    message: string;
+    data: User[]
 }

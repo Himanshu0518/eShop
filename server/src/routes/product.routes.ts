@@ -10,27 +10,29 @@ import { getAllProducts,
   addWordEmbedding,
 } from "../controllers/product.controller";
   import { getReccomendationByProduct,getRecommendationByQuery,getRecommendationByUserHistory } from "../controllers/recommendation.controller";
-import { VerifyJWT } from "../middlewares/authMiddleware";
+import { VerifyJWT, VerifyAdmin } from "../middlewares/authMiddleware";
 import { upload } from "../middlewares/multerMiddleware";
 import { ValidateProductAddition } from "../middlewares/Validation";
 
 const router = Router();
 
 // Define product routes here
-router.route('/getAll').get( getAllProducts);
+router.route('/getAll').get(getAllProducts);
 
 router.route('/get/:id').get(getProductById);
 
 router.route('/update/:id')
  .put(VerifyJWT,
+      VerifyAdmin,
     upload.single('img'),
     updateProduct);
 
-router.route('/delete/:id').delete(VerifyJWT, deleteProduct);
+router.route('/delete/:id').delete(VerifyJWT, VerifyAdmin, deleteProduct);
 
 router.route('/add')
 .post(
   VerifyJWT, 
+  VerifyAdmin,
   upload.single('img'),  
   ValidateProductAddition,
   addProduct
@@ -39,9 +41,9 @@ router.route('/add')
 router.route('/addView/:productId').post(VerifyJWT,addProductView);
 router.route('/getViews').get(VerifyJWT,getProductViews);
 
-router.route('/addEmbedding').post(VerifyJWT,addWordEmbedding);
+router.route('/addEmbedding').post(VerifyJWT,VerifyAdmin,addWordEmbedding);
 
-router.route('/embeddings/bulk').post(bulkAddWordEmbeddings);
+router.route('/embeddings/bulk').post(VerifyJWT,VerifyAdmin,bulkAddWordEmbeddings);
 
 router.route('/getrecommendations/:productId').get(getReccomendationByProduct);
 

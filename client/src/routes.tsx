@@ -20,6 +20,16 @@ import {
   OrderedProduct,
 } from "@/pages";
 
+// Admin imports
+import {
+  AdminLayout,
+  Dashboard,
+  ProductsPage,
+  OrdersPage,
+  UsersPage,
+  SettingsPage,
+} from "@/pages/admin";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -90,6 +100,40 @@ const router = createBrowserRouter([
       {
         path: "product/:productId",
         element: <Product />,
+      },
+    ],
+  },
+
+  // Admin routes (requires authentication AND admin role)
+  {
+    path: "/admin",
+    element: <AuthLayout authentication={true} requireAdmin={true} />,
+    errorElement: <ErrorBoundary />,
+    children: [
+      {
+        element: <AdminLayout />,
+        children: [
+          {
+            index: true,
+            element: <Dashboard />,
+          },
+          {
+            path: "products",
+            element: <ProductsPage />,
+          },
+          {
+            path: "orders",
+            element: <OrdersPage />,
+          },
+          {
+            path: "users",
+            element: <UsersPage />,
+          },
+          {
+            path: "settings",
+            element: <SettingsPage />,
+          },
+        ],
       },
     ],
   },

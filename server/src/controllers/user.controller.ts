@@ -156,11 +156,36 @@ const GetCurrentUser = asyncHandler(async (req: Request, res: Response) => {
 
 const UpdateUserProfile = asyncHandler(async (req: Request, res: Response) => {})
 
+const getAllUsers = asyncHandler(async (_: Request, res: Response) => {
+  try {
+    const users = await prisma.user.findMany({
+      include: {
+        cartItems: true,
+        orders: true,
+        ProductViews: true,
+        favorites: true,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Users fetched successfully",
+      data: users,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: `Unable to fetch users: ${(error as Error).message}`,
+    });
+  }
+});
+
 
 export { 
     SignupUser,
     LoginUser,
     LogoutUser,
     GetCurrentUser,
-    UpdateUserProfile
+    UpdateUserProfile,
+    getAllUsers
 }

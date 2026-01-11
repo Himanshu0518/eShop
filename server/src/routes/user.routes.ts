@@ -1,20 +1,23 @@
 import {Router} from 'express';
-import {SignupUser, LoginUser , GetCurrentUser,LogoutUser} from '../controllers/user.controller';
+import {SignupUser, LoginUser , GetCurrentUser,LogoutUser,getAllUsers} from '../controllers/user.controller';
 import {VaildateSignup, VaildateLogin } from '../middlewares/Validation';
-import { VerifyJWT } from '../middlewares/authMiddleware';
+import { VerifyJWT, VerifyAdmin } from '../middlewares/authMiddleware';
 
 const router = Router();
 
 // User Signup Route
-router.post('/signup', VaildateSignup, SignupUser);
+router.route('/signup').post(VaildateSignup, SignupUser);
 
 // User Login Route
-router.post('/login', VaildateLogin, LoginUser);
+router.route('/login').post(VaildateLogin, LoginUser);
 
 // Get Current User Route
-router.get('/current-user', VerifyJWT, GetCurrentUser);
+router.route('/current-user').get(VerifyJWT,GetCurrentUser);
 
 // User Logout Route
-router.get('/logout', VerifyJWT,LogoutUser)
+router.route('/logout').get(VerifyJWT,LogoutUser);
+
+// for admin get all users 
+router.route('/getAll').get(VerifyJWT,VerifyAdmin,getAllUsers);
 
 export default router;

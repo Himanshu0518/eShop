@@ -3,7 +3,8 @@ import { API_BASE_URL } from '@/lib/api-config';
 import type {
   SignupPayload,
   LoginPayload,
-  AuthResponse
+  AuthResponse,
+  AllUserResponse
 } from '@/types/user.types';
 
 export const userApi = createApi({
@@ -63,6 +64,13 @@ export const userApi = createApi({
         }
       },
       invalidatesTags: ["User"],
+    }),
+
+    // ADMIN ONLY
+    // ---------------- GET ALL USERS ----------------
+    getAllUsers: builder.query<AllUserResponse, void>({
+      query: () => '/users/getAll',
+      providesTags: ["User"],
     }),
 
   }),

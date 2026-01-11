@@ -29,11 +29,11 @@ export const VerifyJWT = asyncHandler(async (req, res, next) => {
         updatedAt: true,
       },
     });
-
+   
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "User not found",
+        message: "Account do not exist check again you credentials",
       });
     }
 
@@ -43,6 +43,19 @@ export const VerifyJWT = asyncHandler(async (req, res, next) => {
     return res.status(401).json({
       success: false,
       message: `Not authorized: ${(error as Error).message}`,
+    });
+  }
+});
+
+
+export const VerifyAdmin = asyncHandler(async (req, res, next) => {
+
+  if (req.user?.isAdmin) {
+    next();
+  } else {
+    return res.status(401).json({
+      success: false,
+      message: "You are not authorized to access this resource",
     });
   }
 });

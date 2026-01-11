@@ -40,3 +40,25 @@ export interface ProductViewResponse {
   message: string;
   data: ProductView[];
 }
+
+export interface WordEmbedding extends Product {
+  embedding: number[];
+}
+
+export interface WordEmbeddingResponse  {
+    sucess: boolean;
+    message: string;
+    data: WordEmbedding
+}
+
+export interface BulkEmbeddingResponse {
+    sucess: boolean;
+    message: string;
+    data: {
+       total: number ,
+      successful: number,
+      failed: number,
+      errors: any[]
+    }
+
+}

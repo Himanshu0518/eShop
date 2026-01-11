@@ -2,6 +2,8 @@ import { uploadToCloudinary,asyncHandler,NormalizeString } from "../utils/utils"
 import {prisma} from "../config/db";
 import { Request, Response } from "express";
 import { getEmbeddings } from "../utils/embeddings";
+
+
 const addProduct = asyncHandler(async (req: Request, res: Response) => {
 
      const { name, description, price, category,sizes, discount } = req.body;
