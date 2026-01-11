@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "@/store/authSlice";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import { AlertCircle } from "lucide-react";
@@ -34,7 +34,7 @@ export const ProtectedRoute = ({
 }: ProtectedRouteProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const currentUser = useSelector((state: any) => state.auth.user);
+  const currentUser = useAppSelector((state) => state.auth.user);
 
   useEffect(() => {
     const isAuthenticated = currentUser?.data?.token;

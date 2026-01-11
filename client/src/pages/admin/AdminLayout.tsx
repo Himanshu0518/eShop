@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/store/authSlice";
+import { Toaster } from "sonner";
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -28,6 +29,8 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Toaster position="top-right" richColors />
+      
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div

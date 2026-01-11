@@ -2,6 +2,7 @@ import { prisma } from "../config/db"
 import {asyncHandler} from "../utils/utils"
 import { Request, Response, CookieOptions } from "express"
 import { hashPassword, comparePassword, createAuthToken } from "../utils/utils"
+
 const SignupUser = asyncHandler(async (req: Request, res: Response) => {
 
     const user = req.body;
@@ -24,7 +25,8 @@ const SignupUser = asyncHandler(async (req: Request, res: Response) => {
                 name:user.name,
                 email:user.email,
                 password:hashedPassword,
-                img:user.img
+                img:user.img,
+                isAdmin:user.isAdmin
             }
          });
        return res.status(201).json({

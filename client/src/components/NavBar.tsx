@@ -10,18 +10,28 @@ import {
 } from "@/components/ui/sheet";
 import { useGetCartQuery } from "@/services/cart.services";
 import { useGetFavoritesQuery } from "@/services/favourites.services";
+import { useAppSelector } from "@/store/authSlice";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 const NavItems = [
   { name: "Home", path: "/" },
   { name: "Contact", path: "/contact" },
   { name: "Orders", path: "/orders" },
   { name: "About", path: "/about" },
+
 ];
 
 function NavBar() {
   const location = useLocation();
-  const { data: cartData } = useGetCartQuery();
-  const { data: favoritesData } = useGetFavoritesQuery();
+  const user = useAppSelector((state) => state.auth.user);
+  const authStatus = useAppSelector((state) => state.auth.status);
+
+  const { data: cartData } = useGetCartQuery(
+    authStatus ? undefined : skipToken
+  );
+  const { data: favoritesData } = useGetFavoritesQuery(
+    authStatus ? undefined : skipToken
+  );
   
   const cartItemsCount = cartData?.data?.length || 0;
   const favoritesCount = favoritesData?.data?.length || 0;
@@ -63,6 +73,22 @@ function NavBar() {
                   {item.name}
                 </Link>
               ))}
+              
+              {
+                user && user.data.isAdmin && (
+                  <Link
+                    to="/admin"
+                    className={`text-sm tracking-wide transition-colors duration-200 ${
+                      location.pathname === '/admin'
+                        ? "text-foreground font-medium"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Admin
+                  </Link>
+                )
+              }
+
             </div>
           </div>
 

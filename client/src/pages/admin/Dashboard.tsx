@@ -17,67 +17,134 @@ import {
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-
-// Sample data - replace with real API data
-const salesData = [
-  { month: "Jan", sales: 4000, orders: 240 },
-  { month: "Feb", sales: 3000, orders: 198 },
-  { month: "Mar", sales: 5000, orders: 380 },
-  { month: "Apr", sales: 4500, orders: 308 },
-  { month: "May", sales: 6000, orders: 450 },
-  { month: "Jun", sales: 5500, orders: 410 },
-];
-
-const categoryData = [
-  { name: "Men", value: 400, color: "#000000" },
-  { name: "Women", value: 300, color: "#404040" },
-  { name: "Kids", value: 200, color: "#737373" },
-  { name: "Accessories", value: 100, color: "#a3a3a3" },
-];
-
-const recentOrders = [
-  { id: "ORD-001", customer: "John Doe", amount: 129.99, status: "completed" },
-  { id: "ORD-002", customer: "Jane Smith", amount: 89.50, status: "pending" },
-  { id: "ORD-003", customer: "Mike Johnson", amount: 199.99, status: "completed" },
-  { id: "ORD-004", customer: "Sarah Wilson", amount: 149.99, status: "processing" },
-];
-
-const stats = [
-  {
-    title: "Total Revenue",
-    value: "$28,500",
-    change: "+12.5%",
-    trend: "up",
-    icon: DollarSign,
-    description: "vs last month",
-  },
-  {
-    title: "Total Orders",
-    value: "1,986",
-    change: "+8.2%",
-    trend: "up",
-    icon: ShoppingBag,
-    description: "vs last month",
-  },
-  {
-    title: "Total Users",
-    value: "4,832",
-    change: "+15.3%",
-    trend: "up",
-    icon: Users,
-    description: "vs last month",
-  },
-  {
-    title: "Total Products",
-    value: "245",
-    change: "-2.1%",
-    trend: "down",
-    icon: Package,
-    description: "vs last month",
-  },
-];
+import { useGetProductsQuery } from "@/services/product.services";
+import { useGetOrdersQuery } from "@/services/order.services";
+import { userApi } from "@/services/user.services";
 
 export default function Dashboard() {
+  const { data: productsData, isLoading: productsLoading } = useGetProductsQuery();
+  const { data: ordersData, isLoading: ordersLoading } = useGetOrdersQuery();
+  const { data: usersData, isLoading: usersLoading } = userApi.useGetAllUsersQuery();
+
+  const products = productsData?.data || [];
+  const orders = ordersData?.data || [];
+  const users = usersData?.data || [];
+
+  // Calculate stats
+  const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+  const totalOrders = orders.length;
+  const totalUsers = users.length;
+  const totalProducts = products.length;
+
+  // Calculate monthly sales data
+  const monthlySalesData = (() => {
+    const monthlyData: { [key: string]: { sales: number; orders: number } } = {};
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    orders.forEach((order) => {
+      const date = new Date(order.createdAt);
+      const monthKey = monthNames[date.getMonth()];
+      
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = { sales: 0, orders: 0 };
+      }
+      
+      monthlyData[monthKey].sales += order.totalPrice;
+      monthlyData[monthKey].orders += 1;
+    });
+
+    // Get last 6 months
+    const currentMonth = new Date().getMonth();
+    const last6Months = [];
+    for (let i = 5; i >= 0; i--) {
+      const monthIndex = (currentMonth - i + 12) % 12;
+      const monthName = monthNames[monthIndex];
+      last6Months.push({
+        month: monthName,
+        sales: monthlyData[monthName]?.sales || 0,
+        orders: monthlyData[monthName]?.orders || 0,
+      });
+    }
+
+    return last6Months;
+  })();
+
+  // Calculate category distribution
+  const categoryData = (() => {
+    const categoryCount: { [key: string]: number } = {};
+    
+    products.forEach((product) => {
+      product.category.forEach((cat) => {
+        categoryCount[cat] = (categoryCount[cat] || 0) + 1;
+      });
+    });
+
+    const colors = ["#000000", "#404040", "#737373", "#a3a3a3", "#d4d4d4"];
+    
+    return Object.entries(categoryCount).map(([name, value], index) => ({
+      name,
+      value,
+      color: colors[index % colors.length],
+    }));
+  })();
+
+  // Get recent orders (last 4)
+  const recentOrders = orders
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 4)
+    .map((order) => ({
+      id: `ORD-${order.id.toString().padStart(3, '0')}`,
+      customer: order.user?.name || order.user?.email || "Unknown",
+      amount: order.totalPrice,
+      status: order.status === "paid" ? "completed" : order.status,
+    }));
+
+  const stats = [
+    {
+      title: "Total Revenue",
+      value: `$${totalRevenue.toFixed(2)}`,
+      change: "+12.5%",
+      trend: "up" as const,
+      icon: DollarSign,
+      description: "vs last month",
+    },
+    {
+      title: "Total Orders",
+      value: totalOrders.toString(),
+      change: "+8.2%",
+      trend: "up" as const,
+      icon: ShoppingBag,
+      description: "vs last month",
+    },
+    {
+      title: "Total Users",
+      value: totalUsers.toString(),
+      change: "+15.3%",
+      trend: "up" as const,
+      icon: Users,
+      description: "vs last month",
+    },
+    {
+      title: "Total Products",
+      value: totalProducts.toString(),
+      change: "-2.1%",
+      trend: "down" as const,
+      icon: Package,
+      description: "vs last month",
+    },
+  ];
+
+  if (productsLoading || ordersLoading || usersLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Welcome Section */}
@@ -130,7 +197,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={salesData}>
+              <LineChart data={monthlySalesData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis
                   dataKey="month"
@@ -178,27 +245,33 @@ export default function Dashboard() {
             <CardDescription>Distribution across categories</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={categoryData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) =>
-                    `${name}: ${(percent * 100).toFixed(0)}%`
-                  }
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            {categoryData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={categoryData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) =>
+                      `${name}: ${(percent * 100).toFixed(0)}%`
+                    }
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {categoryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                No category data available
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -211,7 +284,7 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={salesData}>
+            <BarChart data={monthlySalesData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis
                 dataKey="month"
@@ -255,32 +328,38 @@ export default function Dashboard() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-8">
-            {recentOrders.map((order) => (
-              <div key={order.id} className="flex items-center">
-                <div className="space-y-1 flex-1">
-                  <p className="text-sm font-medium leading-none">{order.id}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {order.customer}
-                  </p>
-                </div>
-                <div className="text-right space-y-1">
-                  <p className="text-sm font-medium">${order.amount}</p>
-                  <div
-                    className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                      order.status === "completed"
-                        ? "bg-green-50 text-green-700"
-                        : order.status === "pending"
-                        ? "bg-yellow-50 text-yellow-700"
-                        : "bg-blue-50 text-blue-700"
-                    }`}
-                  >
-                    {order.status}
+          {recentOrders.length > 0 ? (
+            <div className="space-y-8">
+              {recentOrders.map((order) => (
+                <div key={order.id} className="flex items-center">
+                  <div className="space-y-1 flex-1">
+                    <p className="text-sm font-medium leading-none">{order.id}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {order.customer}
+                    </p>
+                  </div>
+                  <div className="text-right space-y-1">
+                    <p className="text-sm font-medium">${order.amount.toFixed(2)}</p>
+                    <div
+                      className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                        order.status === "completed" || order.status === "paid"
+                          ? "bg-green-50 text-green-700"
+                          : order.status === "pending"
+                          ? "bg-yellow-50 text-yellow-700"
+                          : "bg-blue-50 text-blue-700"
+                      }`}
+                    >
+                      {order.status}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No orders yet
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
