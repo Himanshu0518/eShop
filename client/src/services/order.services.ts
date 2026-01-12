@@ -63,6 +63,13 @@ export const orderApi = createApi({
       query: () => '/getKey',    
     }),
 
+
+    // ADMIN ROUTES 
+
+    getAlldBOrders: builder.query<OrderResponse, void>({
+      query: () => '/getAlldBOrders',
+      providesTags: ["Order"]
+    }),
   }),    
 });
 
@@ -71,5 +78,6 @@ export const {
    useCreateOrderMutation,
    useVerifyPaymentMutation,
    useGetOrdersQuery,
-   useGetKeyQuery
+   useGetKeyQuery,
+   useGetAlldBOrdersQuery
 } = orderApi ;

@@ -163,4 +163,32 @@ const getPaymentKey = asyncHandler(async(_,res:Response)=>{
 })
 
 
-export {verifyPayment,createOrder, getAllOrders, getPaymentKey };
+// get all orders of all users 
+
+const getAlldBOrders = asyncHandler(async(req:Request,res:Response)=>{
+    
+
+   try{
+        const orders = await prisma.order.findMany({
+            include:{
+                product:true,
+                user:true
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+        return res.status(200).json({
+            success:true,
+            message:"Orders fetched successfully",
+            data:orders
+        })
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:`Unable to fetch orders: ${(error as Error).message}`,
+        })
+    }
+})
+
+export {verifyPayment,createOrder, getAllOrders, getPaymentKey, getAlldBOrders };

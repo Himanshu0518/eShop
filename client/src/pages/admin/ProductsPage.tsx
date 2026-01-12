@@ -55,6 +55,7 @@ export default function ProductsPage() {
       toast.success("Product deleted", {
         description: `${name} has been successfully deleted.`,
       });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Error", {
         description: "Failed to delete product. Please try again.",
