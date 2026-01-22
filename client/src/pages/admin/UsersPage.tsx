@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { userApi } from "@/services/user.services";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function UsersPage() {
   const { data: usersData, isLoading } = userApi.useGetAllUsersQuery();
