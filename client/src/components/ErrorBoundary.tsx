@@ -1,10 +1,11 @@
 import { useRouteError, isRouteErrorResponse } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Home, RefreshCw } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
 export default function ErrorBoundary() {
   const error = useRouteError();
-
+  const Navigate = useNavigate();
+  
   let errorMessage: string;
   let errorStatus: string | number = "Error";
 
@@ -54,7 +55,7 @@ export default function ErrorBoundary() {
           </Button>
           
           <Button
-            onClick={() => window.location.href = "/"}
+            onClick={() => Navigate('/')}
             className="rounded-none h-11 px-6 text-xs tracking-wider uppercase bg-foreground hover:bg-foreground/90"
           >
             <Home className="mr-2 h-4 w-4" />

@@ -44,6 +44,7 @@ export interface RazorpayOrderData {
   currency: string;
   entity: "order";
   id: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   notes: any[];
   offer_id: string | null;
   receipt: string | null;

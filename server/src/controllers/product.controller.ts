@@ -126,56 +126,72 @@ const getProductById = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const updateProduct = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { name, description, price, category,sizes, discount } = req.body;
+  const { id } = req.params;
+  const { name, description, price, category, sizes, discount } = req.body;
+  console.log("Updating product with data:", req.body);
+  const productId = Number(id);
+  if (isNaN(productId)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid product id",
+    });
+  }
 
-    try{
-        const existingProduct = await prisma.product.findUnique({
-            where:{
-                id:parseInt(id)
-            }
-        });
-        if(!existingProduct){
-            return res.status(404).json({
-                success:false,
-                message:"Product not found"
-            })
-        }
-       
-        const imgLocalpath = req.file?.path;
-        let imgUrl = existingProduct.img;
-        if(imgLocalpath){
-            const uploadResult = await uploadToCloudinary(imgLocalpath);
-            imgUrl = uploadResult.url;
-        }
-        const updatedProduct = await prisma.product.update({
-            where:{
-                id:parseInt(id)
-            },
-            data:{
-                name:name?name:existingProduct.name,
-                description:description?description:existingProduct.description,
-                price:parseFloat(price)?parseFloat(price):existingProduct.price,
-                category:category?NormalizeString(category):existingProduct.category,
-                sizes:sizes?NormalizeString(sizes):existingProduct.sizes,
-                discount:parseFloat(discount)?parseFloat(discount):existingProduct.discount,
-                img:imgUrl,
-            }
-        });
-        return res.status(200).json({
-            success:true,
-            message:"Product updated successfully",
-            data:updatedProduct
-        })
-    }catch(error){
-        return res.status(500).json({
-            success:false,
-            message:`Unable to update product: ${(error as Error).message}`,
-        })
-    }
- 
-    
+  const existingProduct = await prisma.product.findUnique({
+    where: { id: productId },
+  });
+
+  if (!existingProduct) {
+    return res.status(404).json({
+      success: false,
+      message: "Product not found",
+    });
+  }
+
+  // image handling
+  let imgUrl = existingProduct.img;
+  if (req.file?.path) {
+    const uploadResult = await uploadToCloudinary(req.file.path);
+    imgUrl = uploadResult.url;
+  }
+
+  const updatedProduct = await prisma.product.update({
+    where: { id: productId },
+    data: {
+      name: name ?? existingProduct.name,
+      description: description ?? existingProduct.description,
+
+      price:
+        price !== undefined
+          ? Number(price)
+          : existingProduct.price,
+
+      discount:
+        discount !== undefined
+          ? Number(discount)
+          : existingProduct.discount,
+
+      category:
+        category !== undefined
+          ? NormalizeString(category)
+          : existingProduct.category,
+
+      sizes:
+        sizes !== undefined
+          ? NormalizeString(sizes)
+          : existingProduct.sizes,
+
+      img: imgUrl,
+    },
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Product updated successfully",
+    data: updatedProduct,
+  });
 });
+
 
 const deleteProduct = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;

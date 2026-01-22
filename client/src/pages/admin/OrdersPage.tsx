@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -7,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -23,8 +25,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Eye, Download } from "lucide-react";
-import { useGetOrdersQuery } from "@/services/order.services";
+import { MoreHorizontal, Eye, Download, Search } from "lucide-react";
+import { useGetAlldBOrdersQuery } from "@/services/order.services";
+import OrderDetailDialog from "@/components/admin/OrderDetailDialog";
+import type { Order } from "@/types/order.types";
+import Spinner from "@/components/Spinner";
 
 const getStatusVariant = (status: string): "default" | "secondary" | "outline" | "destructive" => {
   switch (status.toLowerCase()) {
@@ -42,26 +47,83 @@ const getStatusVariant = (status: string): "default" | "secondary" | "outline" |
 };
 
 const formatStatus = (status: string) => {
-  if (status === "paid") return "completed";
+  if (status === "PAID") return "COMPLETED";
+  if (status === "CREATED") return "PROCESSING";
   return status;
 };
 
 export default function OrdersPage() {
-  const { data: ordersData, isLoading } = useGetOrdersQuery();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+
+  const { data: ordersData, isLoading } = useGetAlldBOrdersQuery();
 
   const orders = ordersData?.data || [];
 
+  // Filter orders based on search
+  const filteredOrders = orders.filter((order) => {
+    const searchLower = searchQuery.toLowerCase();
+    const orderId = `ORD-${order.id.toString().padStart(3, '0')}`.toLowerCase();
+    const customerName = order.user?.name?.toLowerCase() || "";
+    const customerEmail = order.user?.email?.toLowerCase() || "";
+    const productName = order.product?.name?.toLowerCase() || "";
+
+    return (
+      orderId.includes(searchLower) ||
+      customerName.includes(searchLower) ||
+      customerEmail.includes(searchLower) ||
+      productName.includes(searchLower)
+    );
+  });
+
   // Calculate stats
   const totalOrders = orders.length;
-  const completedOrders = orders.filter(o => o.status === "paid").length;
-  const processingOrders = orders.filter(o => o.status === "created").length;
-  const pendingOrders = 0; // No pending status in current schema
+  const completedOrders = orders.filter(o => o.status === "PAID").length;
+  const processingOrders = orders.filter(o => o.status === "CREATED").length;
+  const pendingOrders = orders.filter(o => o.status === "PENDING").length;
+
+  const handleViewOrder = (order: Order) => {
+    setSelectedOrder(order);
+    setDetailDialogOpen(true);
+  };
+
+  const handleExport = () => {
+    // Create CSV content
+    const headers = ["Order ID", "Customer", "Email", "Product", "Quantity", "Amount", "Status", "Date"];
+    const rows = orders.map((order) => [
+      `ORD-${order.id.toString().padStart(3, '0')}`,
+      order.user?.name || "Unknown",
+      order.user?.email || "N/A",
+      order.product?.name || "N/A",
+      order.quantity,
+      `$${order.totalPrice.toFixed(2)}`,
+      formatStatus(order.status),
+      new Date(order.createdAt).toLocaleDateString(),
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+    ].join("\n");
+
+    // Download CSV
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `orders-${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <Spinner className="h-8 w-8" />
           <p className="mt-4 text-muted-foreground">Loading orders...</p>
         </div>
       </div>
@@ -71,11 +133,13 @@ export default function OrdersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-3xl font-light tracking-tight">Orders</h2>
-        <p className="text-muted-foreground mt-1">
-          Manage and track all customer orders
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-light tracking-tight">Orders</h2>
+          <p className="text-muted-foreground mt-1">
+            Manage and track all customer orders
+          </p>
+        </div>
       </div>
 
       {/* Stats */}
@@ -109,19 +173,31 @@ export default function OrdersPage() {
       {/* Orders Table */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <CardTitle>Order List</CardTitle>
               <CardDescription>View and manage all orders</CardDescription>
             </div>
-            <Button variant="outline" size="sm">
-              <Download className="mr-2 h-4 w-4" />
-              Export
-            </Button>
+            <div className="flex gap-2">
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search orders..."
+                  className="pl-8"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
-          {orders.length > 0 ? (
+          {filteredOrders.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -137,7 +213,7 @@ export default function OrdersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {orders.map((order) => (
+                {filteredOrders.map((order) => (
                   <TableRow key={order.id}>
                     <TableCell className="font-medium">
                       ORD-{order.id.toString().padStart(3, '0')}
@@ -182,12 +258,14 @@ export default function OrdersPage() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleViewOrder(order)}>
                             <Eye className="mr-2 h-4 w-4" />
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem>Update Status</DropdownMenuItem>
-                          <DropdownMenuItem>Download Invoice</DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Download className="mr-2 h-4 w-4" />
+                            Download Invoice
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -197,11 +275,18 @@ export default function OrdersPage() {
             </Table>
           ) : (
             <div className="text-center py-8 text-muted-foreground">
-              No orders found.
+              {searchQuery ? "No orders found matching your search." : "No orders found."}
             </div>
           )}
         </CardContent>
       </Card>
+
+      {/* Order Detail Dialog */}
+      <OrderDetailDialog
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        order={selectedOrder}
+      />
     </div>
   );
 }

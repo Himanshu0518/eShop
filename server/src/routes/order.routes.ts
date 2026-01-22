@@ -1,4 +1,4 @@
-import {createOrder,verifyPayment,getAllOrders,getPaymentKey} from '../controllers/order.controller'
+import {createOrder,verifyPayment,getAllOrders,getPaymentKey, getAlldBOrders} from '../controllers/order.controller'
 import {Router} from 'express'
 import {VerifyJWT,VerifyAdmin} from '../middlewares/authMiddleware'
 const router = Router();
@@ -8,6 +8,6 @@ router.route('/create-order').post(VerifyJWT,createOrder)
 router.route("/verify-payment").post(VerifyJWT,verifyPayment);
 router.route("/getAll").get(VerifyJWT,getAllOrders);
 router.route("/getKey").get(VerifyJWT,getPaymentKey)
-router.route("/getAlldBOrders").get(VerifyJWT,VerifyAdmin,getAllOrders);
+router.route("/getAlldBOrders").get(VerifyJWT,VerifyAdmin,getAlldBOrders);
 
 export default router

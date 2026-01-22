@@ -71,23 +71,25 @@ export const productApi = createApi({
     }),
   
 
-      //  now here our only admin routes will be there
-        // ADMIN: Create product , while creating product the word embedding will be added automatically
-    createProduct: builder.mutation<Product, Partial<Product>>({
+    //  now here our only admin routes will be there
+    // ADMIN: Create product with FormData (multipart/form-data)
+    createProduct: builder.mutation<Product, FormData>({
       query: (body) => ({
         url: "/products/add",
         method: "POST",
-        body
+        body,
+        formData: true,
       }),
       invalidatesTags: ["Product"]
     }),
 
-    // ADMIN: Update product 
-    updateProduct: builder.mutation<Product, { id: number; data: Partial<Product> }>({
+    // ADMIN: Update product with FormData (multipart/form-data)
+    updateProduct: builder.mutation<Product, { id: number; data: FormData }>({
       query: ({ id, data }) => ({
         url: `/products/update/${id}`,
         method: "PUT",
-        body: data
+        body: data,
+        formData: true,
       }),
       invalidatesTags: (_, __, { id }) => [
         "Product",
@@ -106,20 +108,20 @@ export const productApi = createApi({
     // this is optional if we have add manually some data to db then we can also add word embedding of that 
     addProductWordEmbedding: builder.mutation<WordEmbeddingResponse, number>({
       query: (productId) => ({
-        url: '/addEmbedding',
+        url: '/products/addEmbedding',
         method: 'POST',
         body: {productId},
       }),
 
     }),
-        // if we seeded too much data manually then we can run this to generate word-embedding for all products which embedding does not exist
-        addbulkAddWordEmbeddings: builder.mutation<BulkEmbeddingResponse, void>({
-        query: (body) => ({
-          url: '/embeddings/bulk',
-          method: 'POST',
-          body,
-        }),
+    // if we seeded too much data manually then we can run this to generate word-embedding for all products which embedding does not exist
+    addbulkAddWordEmbeddings: builder.mutation<BulkEmbeddingResponse, void>({
+      query: (body) => ({
+        url: '/products/embeddings/bulk',
+        method: 'POST',
+        body,
       }),
+    }),
 
   }),
 });
@@ -135,4 +137,5 @@ export const {
   useGetRecommendationByUserQuery,
   useCreateProductMutation,
   useUpdateProductMutation,
+  useDeleteProductMutation,
 } = productApi;

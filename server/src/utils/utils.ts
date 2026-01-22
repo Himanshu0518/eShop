@@ -73,13 +73,15 @@ export const deleteFromCloudinary = async (publicId:string)=>{
     }
 }
 
-export const NormalizeString = (str:string):string[]=>{
-   
-   const strArray = Array.isArray(str) 
-            ? str 
-            : typeof str === 'string' 
-                ? str.split(',').map(c => c.trim()) 
-                : [str];
+// utils/normalizeString.ts
+export const NormalizeString = (value: string | string[]): string[] => {
+  if (Array.isArray(value)) {
+    return value.map(v => v.trim()).filter(Boolean);
+  }
 
-    return strArray;
-}
+  return value
+    .split(",")
+    .map(v => v.trim())
+    .filter(Boolean);
+};
+

@@ -18,18 +18,19 @@ import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Cart
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useGetProductsQuery } from "@/services/product.services";
-import { useGetOrdersQuery } from "@/services/order.services";
+import { useGetAlldBOrdersQuery } from "@/services/order.services";
 import { userApi } from "@/services/user.services";
+import Spinner from "@/components/Spinner";
 
 export default function Dashboard() {
   const { data: productsData, isLoading: productsLoading } = useGetProductsQuery();
-  const { data: ordersData, isLoading: ordersLoading } = useGetOrdersQuery();
+  const { data: ordersData, isLoading: ordersLoading } = useGetAlldBOrdersQuery();
   const { data: usersData, isLoading: usersLoading } = userApi.useGetAllUsersQuery();
 
   const products = productsData?.data || [];
   const orders = ordersData?.data || [];
   const users = usersData?.data || [];
-
+  
   // Calculate stats
   const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
   const totalOrders = orders.length;
@@ -89,7 +90,7 @@ export default function Dashboard() {
   })();
 
   // Get recent orders (last 4)
-  const recentOrders = orders
+  const recentOrders = [...orders]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 4)
     .map((order) => ({
@@ -138,7 +139,7 @@ export default function Dashboard() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <Spinner className="h-8 w-8" />
           <p className="mt-4 text-muted-foreground">Loading dashboard...</p>
         </div>
       </div>

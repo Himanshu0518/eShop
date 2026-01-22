@@ -27,7 +27,6 @@ import {
   ProductsPage,
   OrdersPage,
   UsersPage,
-  SettingsPage,
 } from "@/pages/admin";
 
 const router = createBrowserRouter([
@@ -129,10 +128,7 @@ const router = createBrowserRouter([
             path: "users",
             element: <UsersPage />,
           },
-          {
-            path: "settings",
-            element: <SettingsPage />,
-          },
+
         ],
       },
     ],

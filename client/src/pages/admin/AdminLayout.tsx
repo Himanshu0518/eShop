@@ -5,7 +5,6 @@ import {
   ShoppingBag,
   Users,
   Package,
-  Settings,
   LogOut,
   Menu,
   X,
@@ -19,7 +18,6 @@ const navigation = [
   { name: "Products", href: "/admin/products", icon: Package },
   { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
   { name: "Users", href: "/admin/users", icon: Users },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
 export default function AdminLayout() {
