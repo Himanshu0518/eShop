@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef,useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Search, X, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useGetRecommendationByqueryQuery,useGetProductsQuery  } from "@/services/product.services";
+import { useGetRecommendationByqueryQuery, useGetProductsQuery } from "@/services/product.services";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
@@ -21,14 +21,14 @@ export default function SearchBar() {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const { data: allProducts } = useGetProductsQuery();
-const products = useMemo(() => {
-  if (!allProducts?.data) return [];
-  if (!searchQuery.trim()) return allProducts.data;
+  const products = useMemo(() => {
+    if (!allProducts?.data) return [];
+    if (!searchQuery.trim()) return allProducts.data;
 
-  return allProducts.data.filter(product =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-}, [searchQuery, allProducts]);
+    return allProducts.data.filter(product =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery, allProducts]);
 
 
   // Only make API call when user explicitly submits (clicks Search button)
@@ -46,7 +46,7 @@ const products = useMemo(() => {
     }
   }, [isOpen]);
 
-    
+
   const handleProductClick = (productId: number) => {
     navigate(`/product/${productId}`);
     handleClose();
@@ -66,7 +66,7 @@ const products = useMemo(() => {
     if (isDeepSearch) {
       // AI-Powered Search: Trigger API call by setting submittedQuery
       setSubmittedQuery(searchQuery);
-    } 
+    }
   };
 
 
@@ -76,18 +76,18 @@ const products = useMemo(() => {
       {/* Search Trigger Button */}
       <Button
         variant="ghost"
-      
+
         className="gap-2 text-muted-foreground hover:text-foreground"
         onClick={() => setIsOpen(true)}
       >
         <Search className="md:h-8 md:w-8 h-4 w-4" />
-       
+
       </Button>
 
       {/* Search Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-3xl max-h-[85vh] p-0 gap-0">
-          <DialogHeader className="px-6 pt-6 pb-4 border-b">
+        <DialogContent className="max-w-3xl max-h-[85vh] p-0 gap-0 flex flex-col overflow-hidden">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b shrink-0">
             <DialogTitle className="flex items-center gap-2">
               <Search className="h-5 w-5" />
               Search Products
@@ -95,7 +95,7 @@ const products = useMemo(() => {
           </DialogHeader>
 
           {/* Search Input */}
-          <div className="px-6 pt-4">
+          <div className="px-6 pt-4 pb-2 shrink-0">
             <form onSubmit={handleSearch} className="space-y-3">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -139,33 +139,33 @@ const products = useMemo(() => {
                 </div>
 
                 {/* Search Button - Always visible */}
-              {
-                isDeepSearch && (
-                    <Button 
-                  type="submit" 
-                  size="sm"
-                  disabled={!searchQuery.trim() || isLoading}
-                  className="gap-2"
-                >
-                  {isLoading ? (
-                    <>
-                      <Spinner className="h-4 w-4 animate-spin" />
-                      Searching...
-                    </>
-                  ) : (
-                    <>
-                      <Search className="h-4 w-4" />
-                      Search
-                    </>
-                  )}
-                </Button>
-                )
-              }
+                {
+                  isDeepSearch && (
+                    <Button
+                      type="submit"
+                      size="sm"
+                      disabled={!searchQuery.trim() || isLoading}
+                      className="gap-2"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Spinner className="h-4 w-4 animate-spin" />
+                          Searching...
+                        </>
+                      ) : (
+                        <>
+                          <Search className="h-4 w-4" />
+                          Search
+                        </>
+                      )}
+                    </Button>
+                  )
+                }
               </div>
 
               {isDeepSearch && (
                 <p className="text-xs text-muted-foreground">
-                  AI-powered search understands context and finds products similar to your description. 
+                  AI-powered search understands context and finds products similar to your description.
                   <span className="font-medium"> Click Search to find similar products.</span>
                 </p>
               )}
@@ -173,7 +173,7 @@ const products = useMemo(() => {
           </div>
 
           {/* Results */}
-          <div className="flex-1 overflow-y-auto px-6 py-4">
+          <div className="flex-1 overflow-y-auto px-6 py-4 min-h-0">
             {/* Loading State */}
             {isLoading && isDeepSearch && (
               <div className="flex flex-col items-center justify-center py-12 gap-3">
@@ -215,7 +215,7 @@ const products = useMemo(() => {
                       >
                         <div className="w-20 h-20 shrink-0 bg-muted rounded overflow-hidden">
                           <img
-                            src={product.img }
+                            src={product.img}
                             alt={product.name}
                             className="w-full h-full object-cover"
                           />
@@ -278,7 +278,7 @@ const products = useMemo(() => {
                       >
                         <div className="w-20 h-20 shrink-0 bg-muted rounded overflow-hidden">
                           <img
-                            src={product.img }
+                            src={product.img}
                             alt={product.name}
                             className="w-full h-full object-cover"
                           />
@@ -323,7 +323,7 @@ const products = useMemo(() => {
                 <div>
                   <p className="font-medium mb-1">Start searching</p>
                   <p className="text-sm text-muted-foreground">
-                    {isDeepSearch 
+                    {isDeepSearch
                       ? "Type your search and click the Search button for AI-powered results"
                       : "Type your search query and press Enter or click Search"
                     }

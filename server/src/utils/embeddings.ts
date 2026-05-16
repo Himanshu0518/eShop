@@ -7,7 +7,7 @@ export const getEmbeddings = async (text: string) => {
         });
 
         const response = await ai.models.embedContent({
-            model: 'text-embedding-004',
+            model: 'gemini-embedding-001',
             contents: text,
             config: {
                 outputDimensionality: 512
