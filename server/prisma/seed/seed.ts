@@ -345,23 +345,54 @@ const products = [
   }
 ];
 
+const adjectives = ["Classic", "Modern", "Vintage", "Elegant", "Casual", "Premium", "Stylish", "Comfortable", "Urban", "Sporty", "Cozy", "Luxury", "Chic", "Essential", "Minimalist"];
+const types = ["T-Shirt", "Jacket", "Jeans", "Sneakers", "Dress", "Sweater", "Hoodie", "Shorts", "Backpack", "Hat", "Sunglasses", "Watch", "Boots", "Scarf", "Belt"];
+const categoriesList = [["Men"], ["Women"], ["Men", "Women"], ["Kids"], ["Accessories"], ["Men", "Accessories"], ["Women", "Accessories"]];
+const sizeOptions = [["S", "M", "L", "XL"], ["XS", "S", "M", "L", "XL"], ["One Size"], ["28", "30", "32", "34", "36"], ["36", "37", "38", "39", "40", "41", "42"]];
+const images = [
+  "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=500&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=500&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1627123424574-724758594e93?w=500&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=500&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=500&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500&h=600&fit=crop",
+  "https://images.unsplash.com/photo-1506529082955-511b1aa562c8?w=500&h=600&fit=crop"
+];
+
 async function main() {
   console.log("🌱 Starting to seed products...");
 
+  const generatedProducts = Array.from({ length: 500 }).map((_, i) => {
+    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const type = types[Math.floor(Math.random() * types.length)];
+    const category = categoriesList[Math.floor(Math.random() * categoriesList.length)];
+    const sizes = sizeOptions[Math.floor(Math.random() * sizeOptions.length)];
+    const img = images[Math.floor(Math.random() * images.length)];
+    
+    return {
+      name: `${adj} ${type} ${i + 1}`,
+      description: `A beautiful ${adj.toLowerCase()} ${type.toLowerCase()} perfect for any occasion. High quality and durable.`,
+      price: Number((Math.random() * 150 + 10).toFixed(2)),
+      discount: Math.random() > 0.5 ? Math.floor(Math.random() * 30) : 0,
+      category,
+      sizes,
+      img
+    };
+  });
+
+  const allProducts = [...products, ...generatedProducts];
+
   try {
-    // Delete existing products (optional - comment out if you want to keep existing data)
-    // await prisma.product.deleteMany({});
-    // console.log("🗑️ Cleared existing products");
-
-    for (const product of products) {
-      await prisma.product.create({
-        data: product,
-      });
-      console.log(`✅ Created: ${product.name}`);
-    }
-
+    console.log(`📦 Total products to add: ${allProducts.length}`);
+    await prisma.product.createMany({
+      data: allProducts,
+      skipDuplicates: true,
+    });
     console.log("🎉 Seeding completed successfully!");
-    console.log(`📦 Total products added: ${products.length}`);
   } catch (error) {
     console.error("❌ Error seeding products:", error);
     process.exit(1);

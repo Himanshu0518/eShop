@@ -4,6 +4,7 @@ import { API_BASE_URL } from '@/lib/api-config';
 import type {
   Product,
   ProductListResponse,
+  PaginatedProductResponse,
   ProductDetailResponse,
   ProductViewResponse,
   WordEmbeddingResponse,
@@ -29,8 +30,29 @@ export const productApi = createApi({
   endpoints: (builder) => ({
 
     // ---------------- PRODUCTS ----------------
-    getProducts: builder.query<ProductListResponse, void>({
-      query: () => '/products/getAll',
+    getProducts: builder.query<ProductListResponse, string | void>({
+      query: (searchText) => searchText ? `/products/getAll?searchText=${searchText}` : '/products/getAll',
+      providesTags: ["Product"]
+    }),
+
+    // Paginated products for infinite scroll
+    getProductsPaginated: builder.query<PaginatedProductResponse, { cursor?: number }>({ 
+      query: ({ cursor }) => {
+        const params = new URLSearchParams();
+        if (cursor) params.set('cursor', String(cursor));
+        const qs = params.toString();
+        return `/products/getAll${qs ? `?${qs}` : ''}`;
+      },
+      // All pages share one cache entry (ignore cursor in cache key)
+      serializeQueryArgs: ({ endpointName }) => endpointName,
+      // Append new page data to existing cached data
+      merge: (currentCache, newItems) => {
+        currentCache.data.push(...newItems.data);
+        currentCache.nextCursor = newItems.nextCursor;
+        currentCache.hasMore = newItems.hasMore;
+      },
+      // Always refetch when cursor changes
+      forceRefetch: ({ currentArg, previousArg }) => currentArg !== previousArg,
       providesTags: ["Product"]
     }),
 
@@ -129,6 +151,7 @@ export const productApi = createApi({
 
 export const {
   useGetProductsQuery,
+  useGetProductsPaginatedQuery,
   useGetProductQuery,
   useGetRecommendedByProductQuery,
   useAddViewMutation,

@@ -1,35 +1,73 @@
-import { Heart, ShoppingCart} from "lucide-react";
+import { Heart, ShoppingCart, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useGetProductsQuery, } from "@/services/product.services";
+import { useGetProductsPaginatedQuery } from "@/services/product.services";
 import { useAddToCartMutation } from "@/services/cart.services";
 import { useToggleFavouriteMutation } from "@/services/favourites.services";
 import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useAppSelector } from "@/store/authSlice";
 
 export default function NewArrivals() {
-  const { data: products, error, isLoading, isSuccess } = useGetProductsQuery();
+  // ── Pagination state ──────────────────────────────────────────
+  const [cursor, setCursor] = useState<number | undefined>(undefined);
+
+  const {
+    data: productsData,
+    error,
+    isLoading,      // true only on first load
+    isFetching,     // true on every fetch (including next pages)
+    isSuccess,
+  } = useGetProductsPaginatedQuery({ cursor });
+
+  const products = productsData?.data ?? [];
+  const hasMore = productsData?.hasMore ?? true;
+
+  // ── IntersectionObserver for infinite scroll ──────────────────
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  const loadMore = useCallback(() => {
+    if (!isFetching && hasMore && productsData?.nextCursor) {
+      setCursor(productsData.nextCursor);
+    }
+  }, [isFetching, hasMore, productsData?.nextCursor]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // When sentinel enters viewport, load next page
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  // ── Cart & Favourites ─────────────────────────────────────────
   const [addToCart] = useAddToCartMutation();
   const [toggleFavourite] = useToggleFavouriteMutation();
   const [loadingStates, setLoadingStates] = useState<{ [key: number]: { cart: boolean; fav: boolean } }>({});
-  
-
-
   const authStatus = useAppSelector((state) => state.auth.status);
- 
+
   const handleAddToCart = async (e: React.MouseEvent, productId: number, productName: string) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!authStatus) {
       toast.error("Please login to add items to cart");
       return;
     }
-    
+
     setLoadingStates(prev => ({ ...prev, [productId]: { ...prev[productId], cart: true } }));
-    
+
     try {
       await addToCart({ productId, quantity: 1 }).unwrap();
       toast.success(`${productName} added to cart!`, {
@@ -47,14 +85,14 @@ export default function NewArrivals() {
   const handleToggleFavourite = async (e: React.MouseEvent, productId: number, productName: string) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!authStatus) {
       toast.error("Please login to add items to favourites");
       return;
     }
-    
+
     setLoadingStates(prev => ({ ...prev, [productId]: { ...prev[productId], fav: true } }));
-    
+
     try {
       await toggleFavourite({ productId }).unwrap();
       toast.success(`${productName} added to favourites!`, {
@@ -68,8 +106,6 @@ export default function NewArrivals() {
       setLoadingStates(prev => ({ ...prev, [productId]: { ...prev[productId], fav: false } }));
     }
   };
-
-
 
   return (
     <section className="py-12 md:py-20 px-6 md:px-16 lg:px-24 bg-muted/30">
@@ -91,7 +127,7 @@ export default function NewArrivals() {
        
         </div>
 
-        {/* Loading State */}
+        {/* Initial Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-20">
             <div className="text-center space-y-4">
@@ -132,7 +168,7 @@ export default function NewArrivals() {
 
         {/* Products Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-          {isSuccess && products.data.map((product) => (
+          {isSuccess && products.map((product) => (
             <div key={product.id} className="group relative">
               <Link to={`/product/${product.id}`} className="block">
                 <div className="space-y-4">
@@ -222,6 +258,21 @@ export default function NewArrivals() {
               </Link>
             </div>
           ))}
+        </div>
+
+        {/* ── Sentinel + Loading More indicator ── */}
+        <div ref={sentinelRef} className="flex items-center justify-center py-10">
+          {isFetching && !isLoading && (
+            <div className="flex items-center gap-3 text-muted-foreground">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span className="text-sm tracking-wider">Loading more products...</span>
+            </div>
+          )}
+          {!hasMore && products.length > 0 && (
+            <p className="text-sm text-muted-foreground tracking-wider">
+              You've seen all {products.length} products
+            </p>
+          )}
         </div>
       </div>
     </section>

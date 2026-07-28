@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, X, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useGetRecommendationByqueryQuery, useGetProductsQuery } from "@/services/product.services";
@@ -20,15 +20,21 @@ export default function SearchBar() {
   const [isDeepSearch, setIsDeepSearch] = useState(false);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
-  const { data: allProducts } = useGetProductsQuery();
-  const products = useMemo(() => {
-    if (!allProducts?.data) return [];
-    if (!searchQuery.trim()) return allProducts.data;
+  const [debouncedQuery, setDebouncedQuery] = useState("");
 
-    return allProducts.data.filter(product =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [searchQuery, allProducts]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const { data: allProducts, isFetching: isProductsFetching } = useGetProductsQuery(
+    debouncedQuery || undefined,
+    { skip: isDeepSearch }
+  );
+
+  const products = allProducts?.data || [];
 
 
   // Only make API call when user explicitly submits (clicks Search button)
@@ -175,11 +181,12 @@ export default function SearchBar() {
           {/* Results */}
           <div className="flex-1 overflow-y-auto px-6 py-4 min-h-0">
             {/* Loading State */}
-            {isLoading && isDeepSearch && (
+            {/* Loading State */}
+            {((isLoading && isDeepSearch) || (!isDeepSearch && isProductsFetching)) && (
               <div className="flex flex-col items-center justify-center py-12 gap-3">
                 <Spinner className="h-8 w-8 animate-spin text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">
-                  Analyzing your search with AI...
+                  {isDeepSearch ? "Analyzing your search with AI..." : "Searching..."}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   This may take a few moments
@@ -251,11 +258,11 @@ export default function SearchBar() {
               </div>
             )}
 
-            {!isDeepSearch && products && searchQuery && (
+            {!isDeepSearch && products && debouncedQuery && !isProductsFetching && (
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Sparkles className="h-4 w-4" />
-                  <span>Found {products.length} similar products for "{submittedQuery}"</span>
+                  <Search className="h-4 w-4" />
+                  <span>Found {products.length} products for "{debouncedQuery}"</span>
                 </div>
 
                 {products.length === 0 ? (
@@ -315,7 +322,7 @@ export default function SearchBar() {
             )}
 
             {/* Empty State - Before Search */}
-            {!submittedQuery && !isLoading && (
+            {((isDeepSearch && !submittedQuery && !isLoading) || (!isDeepSearch && !debouncedQuery && !isProductsFetching)) && (
               <div className="text-center py-12 space-y-4">
                 <div className="w-16 h-16 mx-auto rounded-full bg-muted flex items-center justify-center">
                   <Search className="h-8 w-8 text-muted-foreground" />

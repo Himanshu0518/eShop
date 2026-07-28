@@ -1,96 +1,121 @@
-import { uploadToCloudinary,asyncHandler,NormalizeString } from "../utils/utils";
-import {prisma} from "../config/db";
+import { uploadToCloudinary, asyncHandler, NormalizeString } from "../utils/utils";
+import { prisma } from "../config/db";
 import { Request, Response } from "express";
 import { getEmbeddings } from "../utils/embeddings";
 
 
 const addProduct = asyncHandler(async (req: Request, res: Response) => {
 
-     const { name, description, price, category,sizes, discount } = req.body;
-    
-     let imgLocalpath = req.file?.path;
-    if(!imgLocalpath){
+    const { name, description, price, category, sizes, discount } = req.body;
+
+    let imgLocalpath = req.file?.path;
+    if (!imgLocalpath) {
         return res.status(400).json({
-            success:false,
-            message:"Image is required"
+            success: false,
+            message: "Image is required"
         })
     }
-     try{
-         const uploadResult = await uploadToCloudinary(imgLocalpath!);
-         // add word_embedding ---> description + category.join(' ) + name 
-        
-            const newProduct = await prisma.product.create({
-            data:{
+    try {
+        const uploadResult = await uploadToCloudinary(imgLocalpath!);
+        // add word_embedding ---> description + category.join(' ) + name 
+
+        const newProduct = await prisma.product.create({
+            data: {
                 name,
                 description,
-                price:parseFloat(price),
-                category:NormalizeString(category),
+                price: parseFloat(price),
+                category: NormalizeString(category),
                 sizes: NormalizeString(sizes),
-                discount:parseFloat(discount),
-                img:uploadResult.url,
+                discount: parseFloat(discount),
+                img: uploadResult.url,
             }
-         })
+        })
 
-         const text=`${description} ${category} ${name}`
-         const embeddings = await getEmbeddings(text);
-      
-         
-         const embedding = embeddings[0]['values'];
-        console.log("dimensions ",embedding.length);
-       const vector = `[${embedding.join(",")}]`;
+        const text = `${description} ${category} ${name}`
+        const embeddings = await getEmbeddings(text);
 
-// Insert/update embedding using raw SQL
-          await prisma.$executeRawUnsafe(
-    `INSERT INTO "ProductEmbedding" ("productId", "embedding", "createdAt", "updatedAt")
+
+        const embedding = embeddings[0]['values'];
+        console.log("dimensions ", embedding.length);
+        const vector = `[${embedding.join(",")}]`;
+
+        // Insert/update embedding using raw SQL
+        await prisma.$executeRawUnsafe(
+            `INSERT INTO "ProductEmbedding" ("productId", "embedding", "createdAt", "updatedAt")
     VALUES ($1, $2::vector, NOW(), NOW())
     ON CONFLICT ("productId") 
     DO UPDATE SET 
         "embedding" = EXCLUDED.embedding,
         "updatedAt" = NOW();`,
-    newProduct.id,
-    vector
-);
+            newProduct.id,
+            vector
+        );
 
 
 
-         const wordEmbedding = await prisma.productEmbedding.findFirst({
-            where:{
-                productId:newProduct.id
+        const wordEmbedding = await prisma.productEmbedding.findFirst({
+            where: {
+                productId: newProduct.id
             }
-         })
-
-      
-            return  res.status(201).json({
-                success:true,
-                message:"Product added successfully",
-                data: {...newProduct , wordEmbedding}
-            })
-     }catch(error){
-        return res.status(500).json({
-            success:false,
-            message:`Unable to add product: ${(error as Error).message}`,
         })
-     }
+
+
+        return res.status(201).json({
+            success: true,
+            message: "Product added successfully",
+            data: { ...newProduct, wordEmbedding }
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: `Unable to add product: ${(error as Error).message}`,
+        })
+    }
 });
 
-const getAllProducts = asyncHandler(async (_: Request, res: Response) => {
-    try{
-        const products =  await prisma.product.findMany(
-            {
-                orderBy: {
-                    createdAt: 'desc'
-                }
+const getAllProducts = asyncHandler(async (req: Request, res: Response) => {
+
+    const searchText = req.query.searchText as string;
+    const cursorParam = req.query.cursor ? Number(req.query.cursor) : undefined;
+    const take = req.query.take ? Number(req.query.take) : 12;
+
+    try {
+        const where = searchText
+            ? {
+                OR: [
+                    { name: { contains: searchText } },
+                    { description: { contains: searchText } },
+                    { category: { has: searchText } },
+                ],
             }
-        );
+            : undefined;
+
+        // Fetch one extra to determine if there are more items
+        const products = await prisma.product.findMany({
+            where,
+            orderBy: { createdAt: 'desc' },
+            take: take + 1,
+            ...(cursorParam && {
+                cursor: { id: cursorParam },
+                skip: 1, // Skip the cursor item itself
+            }),
+        });
+
+        const hasMore = products.length > take;
+        const data = hasMore ? products.slice(0, take) : products;
+        const nextCursor = hasMore ? data[data.length - 1].id : null;
+
         return res.status(200).json({
-            success:true,
-            message:"Products fetched successfully",
-            data:products
+            success: true,
+            message: "Products fetched successfully",
+            data,
+            nextCursor,
+            hasMore,
         })
-    }catch(error){
+    } catch (error) {
         return res.status(500).json({
-            success:false,
-            message:`Unable to fetch products: ${(error as Error).message}`,
+            success: false,
+            message: `Unable to fetch products: ${(error as Error).message}`,
         })
     }
 });
@@ -98,173 +123,173 @@ const getAllProducts = asyncHandler(async (_: Request, res: Response) => {
 const getProductById = asyncHandler(async (req: Request, res: Response) => {
 
     const { id } = req.params;
-    
-    try{
+
+    try {
         const product = await prisma.product.findUnique({
-            where:{
-                id:parseInt(id)
+            where: {
+                id: parseInt(id)
             }
         });
-         if(!product){
+        if (!product) {
             return res.status(404).json({
-                success:false,
-                message:"Product not found"
+                success: false,
+                message: "Product not found"
             })
         }
-       
+
         return res.status(200).json({
-            success:true,
-            message:"Product fetched successfully",
-            data:product
+            success: true,
+            message: "Product fetched successfully",
+            data: product
         })
-    }catch(error){
+    } catch (error) {
         return res.status(500).json({
-            success:false,
-            message:`Unable to fetch product: ${(error as Error).message}`,
+            success: false,
+            message: `Unable to fetch product: ${(error as Error).message}`,
         })
     }
 });
 
 const updateProduct = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { name, description, price, category, sizes, discount } = req.body;
-  console.log("Updating product with data:", req.body);
-  const productId = Number(id);
-  if (isNaN(productId)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid product id",
+    const { id } = req.params;
+    const { name, description, price, category, sizes, discount } = req.body;
+    console.log("Updating product with data:", req.body);
+    const productId = Number(id);
+    if (isNaN(productId)) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid product id",
+        });
+    }
+
+    const existingProduct = await prisma.product.findUnique({
+        where: { id: productId },
     });
-  }
 
-  const existingProduct = await prisma.product.findUnique({
-    where: { id: productId },
-  });
+    if (!existingProduct) {
+        return res.status(404).json({
+            success: false,
+            message: "Product not found",
+        });
+    }
 
-  if (!existingProduct) {
-    return res.status(404).json({
-      success: false,
-      message: "Product not found",
+    // image handling
+    let imgUrl = existingProduct.img;
+    if (req.file?.path) {
+        const uploadResult = await uploadToCloudinary(req.file.path);
+        imgUrl = uploadResult.url;
+    }
+
+    const updatedProduct = await prisma.product.update({
+        where: { id: productId },
+        data: {
+            name: name ?? existingProduct.name,
+            description: description ?? existingProduct.description,
+
+            price:
+                price !== undefined
+                    ? Number(price)
+                    : existingProduct.price,
+
+            discount:
+                discount !== undefined
+                    ? Number(discount)
+                    : existingProduct.discount,
+
+            category:
+                category !== undefined
+                    ? NormalizeString(category)
+                    : existingProduct.category,
+
+            sizes:
+                sizes !== undefined
+                    ? NormalizeString(sizes)
+                    : existingProduct.sizes,
+
+            img: imgUrl,
+        },
     });
-  }
 
-  // image handling
-  let imgUrl = existingProduct.img;
-  if (req.file?.path) {
-    const uploadResult = await uploadToCloudinary(req.file.path);
-    imgUrl = uploadResult.url;
-  }
-
-  const updatedProduct = await prisma.product.update({
-    where: { id: productId },
-    data: {
-      name: name ?? existingProduct.name,
-      description: description ?? existingProduct.description,
-
-      price:
-        price !== undefined
-          ? Number(price)
-          : existingProduct.price,
-
-      discount:
-        discount !== undefined
-          ? Number(discount)
-          : existingProduct.discount,
-
-      category:
-        category !== undefined
-          ? NormalizeString(category)
-          : existingProduct.category,
-
-      sizes:
-        sizes !== undefined
-          ? NormalizeString(sizes)
-          : existingProduct.sizes,
-
-      img: imgUrl,
-    },
-  });
-
-  return res.status(200).json({
-    success: true,
-    message: "Product updated successfully",
-    data: updatedProduct,
-  });
+    return res.status(200).json({
+        success: true,
+        message: "Product updated successfully",
+        data: updatedProduct,
+    });
 });
 
 
 const deleteProduct = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    try{
+    try {
         const product = await prisma.product.delete({
-            where:{
-                id:parseInt(id)
+            where: {
+                id: parseInt(id)
             }
         });
         return res.status(200).json({
-            success:true,
-            message:"Product deleted successfully",
-            data:product
+            success: true,
+            message: "Product deleted successfully",
+            data: product
         })
-    }catch(error){
+    } catch (error) {
         return res.status(500).json({
-            success:false,
-            message:`Unable to delete product: ${(error as Error).message}`,
+            success: false,
+            message: `Unable to delete product: ${(error as Error).message}`,
         })
     }
 });
 
 const addProductView = asyncHandler(async (req: Request, res: Response) => {
-    const {productId} = req.params;
+    const { productId } = req.params;
     const userId = req.user.id;
 
-  
-    try{
+
+    try {
 
         const existingProductView = await prisma.productView.findUnique({
-            where:{
-                userId_productId:{
-                    userId:userId,
-                    productId:Number(productId)
+            where: {
+                userId_productId: {
+                    userId: userId,
+                    productId: Number(productId)
                 }
             }
         })
 
-        if(existingProductView){
-             return res.status(200).json({
-            success:true,
-            message:"Product view added successfully",
-            data:existingProductView
-        })
+        if (existingProductView) {
+            return res.status(200).json({
+                success: true,
+                message: "Product view added successfully",
+                data: existingProductView
+            })
         }
         const productView = await prisma.productView.create({
-            data:{
-                productId:Number(productId),
-                userId:Number(userId)
+            data: {
+                productId: Number(productId),
+                userId: Number(userId)
             }
         });
         return res.status(200).json({
-            success:true,
-            message:"Product view added successfully",
-            data:productView
+            success: true,
+            message: "Product view added successfully",
+            data: productView
         })
-    }catch(error){
+    } catch (error) {
         return res.status(500).json({
-            success:false,
-            message:`Unable to add product view: ${(error as Error).message}`,
+            success: false,
+            message: `Unable to add product view: ${(error as Error).message}`,
         })
     }
-    
+
 })
 
 
 const getProductViews = asyncHandler(async (req: Request, res: Response) => {
-    try{
+    try {
         const productViews = await prisma.productView.findMany(
             {
-                include:{
-                    product:true
+                include: {
+                    product: true
                 },
                 orderBy: {
                     viewedAt: 'desc'
@@ -272,74 +297,74 @@ const getProductViews = asyncHandler(async (req: Request, res: Response) => {
                 where: {
                     userId: req.user.id
                 }
-                
+
             }
-           
+
         );
         return res.status(200).json({
-            success:true,
-            message:"Product views fetched successfully",
-            data:productViews
+            success: true,
+            message: "Product views fetched successfully",
+            data: productViews
         })
-    }catch(error){
+    } catch (error) {
         return res.status(500).json({
-            success:false,
-            message:`Unable to fetch product views: ${(error as Error).message}`,
+            success: false,
+            message: `Unable to fetch product views: ${(error as Error).message}`,
         })
     }
-    
+
 })
 
 const addWordEmbedding = asyncHandler(async (req: Request, res: Response) => {
-    const {productId} = req.body;
-   
+    const { productId } = req.body;
 
-    try{
+
+    try {
         const product = await prisma.product.findUnique({
-            where:{
-                id:parseInt(productId)
+            where: {
+                id: parseInt(productId)
             }
         })
 
-        if(!product){
+        if (!product) {
             return res.status(404).json({
-                success:false,
-                message:"Product not found"
+                success: false,
+                message: "Product not found"
             })
         }
-      const text=`${product.description} ${product.category} ${product.name}`
-         const embeddings = await getEmbeddings(text);
-      
-     
-         const embedding = embeddings[0]['values'];
-        console.log("dimensions ",embedding.length);
-       const vector = `[${embedding.join(",")}]`;
+        const text = `${product.description} ${product.category} ${product.name}`
+        const embeddings = await getEmbeddings(text);
 
-// Insert/update embedding using raw SQL
-     await prisma.$executeRawUnsafe(
-    `INSERT INTO "ProductEmbedding" ("productId", "embedding", "createdAt", "updatedAt")
+
+        const embedding = embeddings[0]['values'];
+        console.log("dimensions ", embedding.length);
+        const vector = `[${embedding.join(",")}]`;
+
+        // Insert/update embedding using raw SQL
+        await prisma.$executeRawUnsafe(
+            `INSERT INTO "ProductEmbedding" ("productId", "embedding", "createdAt", "updatedAt")
     VALUES ($1, $2::vector, NOW(), NOW())
     ON CONFLICT ("productId") 
     DO UPDATE SET 
         "embedding" = EXCLUDED.embedding,
         "updatedAt" = NOW();`,
-    product.id,
-    vector
-);
+            product.id,
+            vector
+        );
 
 
-      
-            return  res.status(201).json({
-                success:true,
-                message:"Product added successfully",
-                data: {...product , embeddings}
-            })
-}catch(error){
-    return res.status(500).json({
-        success:false,
-        message:`Unable to add word embedding: ${(error as Error).message}`,
-    })
-}
+
+        return res.status(201).json({
+            success: true,
+            message: "Product added successfully",
+            data: { ...product, embeddings }
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: `Unable to add word embedding: ${(error as Error).message}`,
+        })
+    }
 
 })
 
@@ -349,7 +374,8 @@ const bulkAddWordEmbeddings = asyncHandler(async (req: Request, res: Response) =
         const products = await prisma.product.findMany({
             where: {
                 embedding: null
-            }
+            },
+            take: 200
         });
 
         if (products.length === 0) {
@@ -366,10 +392,10 @@ const bulkAddWordEmbeddings = asyncHandler(async (req: Request, res: Response) =
 
         // Process products in batches to avoid overwhelming the API
         const batchSize = 5; // Process 5 at a time
-        
+
         for (let i = 0; i < products.length; i += batchSize) {
             const batch = products.slice(i, i + batchSize);
-            
+
             // Process batch concurrently
             const batchPromises = batch.map(async (product) => {
                 try {
@@ -403,7 +429,7 @@ const bulkAddWordEmbeddings = asyncHandler(async (req: Request, res: Response) =
             });
 
             await Promise.all(batchPromises);
-            
+
             // Optional: Add a small delay between batches to avoid rate limiting
             if (i + batchSize < products.length) {
                 await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
@@ -429,6 +455,7 @@ const bulkAddWordEmbeddings = asyncHandler(async (req: Request, res: Response) =
     }
 });
 
+
 export {
     addProduct,
     getAllProducts,
@@ -438,5 +465,5 @@ export {
     addProductView,
     getProductViews,
     addWordEmbedding,
-    bulkAddWordEmbeddings 
+    bulkAddWordEmbeddings
 };

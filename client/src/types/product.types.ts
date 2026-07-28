@@ -19,6 +19,14 @@ export interface ProductListResponse {
   data: Product[];
 }
 
+export interface PaginatedProductResponse {
+  success: boolean;
+  message: string;
+  data: Product[];
+  nextCursor: number | null;
+  hasMore: boolean;
+}
+
 export interface ProductDetailResponse {
   success: boolean;
   message: string;
