@@ -2,37 +2,35 @@ import type {User} from './user.types'
 import type {Product} from './product.types'
 
 export interface OrderDb {
-  id  : number ; 
-  totalPrice : number ;  
+  id: number;
+  totalPrice: number;
   createdAt: string;
   updatedAt: string;
-  quantity : number  
-  razorpayOrderId : string ;
-  status : string ;  // created or paid 
-  user   ?  : User   
-  product  ? : Product
+  quantity: number;
+  razorpayOrderId?: string | null;
+  razorpayPaymentId?: string | null;
+  status: string; // PENDING, CREATED, PAID, FAILED
+  user?: User;
+  product?: Product;
 }
-
-
 
 export interface Order {
-  id  : number ; 
-  totalPrice : number ;  
+  id: number;
+  totalPrice: number;
   createdAt: string;
   updatedAt: string;
-  quantity : number  
-  razorpayOrderId : string ;
-  status : string ;
-  user   ?  : User   
-  product  ? : Product
+  quantity: number;
+  razorpayOrderId?: string | null;
+  razorpayPaymentId?: string | null;
+  status: string;
+  user?: User;
+  product?: Product;
 }
 
-
-
 export interface CreateOrderPayload {
- productId:number ;
- totalAmount : number ;
- quantity ? :number ;
+  productId: number;
+  quantity?: number;
+  totalAmount?: number;
 }
 
 export interface RazorpayOrderData {
@@ -51,6 +49,9 @@ export interface RazorpayOrderData {
   status: "created";
   orderId: number;
   USD_TO_INR: number;
+  totalPrice?: number;
+  unitPrice?: number;
+  quantity?: number;
 }
 
 export interface CreateOrderResponse {
@@ -76,8 +77,8 @@ export interface OrderResponse {
   data: Order[];
 }
 
-export interface PaymentKeyResponse{
+export interface PaymentKeyResponse {
   success: boolean;
   message: string;
-  key:string 
+  key: string;
 }

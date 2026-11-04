@@ -113,28 +113,23 @@ function Product() {
 
     if (!authStatus) {
       navigate("/login");
+      setIsCreatingOrder(false);
+      return;
     }
     try {
-      const totalAmount = calculateNetPrice(
-        product?.price || 0,
-        product?.discount || 0
-      );
       const order = await createOrder({
         productId: Number(productId),
         quantity,
-        totalAmount,
       }).unwrap();
 
-      console.log(order);
       const key = keyData?.key;
-      console.log(key);
       const options = {
         key,
-        amount: totalAmount, // Amount is in currency subunits.
+        amount: order.data.amount, // Authoritative amount in paise calculated by backend
         currency: "INR",
         name: "Acme Corp",
-        description: "Test Transaction",
-        order_id: order.data.id, // This is the order_id created in the backend
+        description: `Order #${order.data.orderId}`,
+        order_id: order.data.id, // Razorpay order id created in backend
 
         handler: async function (response: any) {
           try {
