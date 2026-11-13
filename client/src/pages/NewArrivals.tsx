@@ -87,7 +87,7 @@ export default function NewArrivals() {
     }
   };
 
-  const handleToggleFavourite = async (e: React.MouseEvent, productId: number, productName: string) => {
+  const handleToggleFavourite = async (e: React.MouseEvent, productId: number) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -187,7 +187,7 @@ export default function NewArrivals() {
                           size="icon"
                           variant="secondary"
                           className="rounded-full h-12 w-12 shadow-lg"
-                          onClick={(e) => handleToggleFavourite(e, product.id, product.name)}
+                          onClick={(e) => handleToggleFavourite(e, product.id)}
                         >
                           <Heart
                             className={`h-5 w-5 transition-colors ${
@@ -218,7 +218,7 @@ export default function NewArrivals() {
                           size="icon"
                           variant="secondary"
                           className="rounded-full h-9 w-9 shadow-md bg-white/90 hover:bg-white"
-                          onClick={(e) => handleToggleFavourite(e, product.id, product.name)}
+                          onClick={(e) => handleToggleFavourite(e, product.id)}
                         >
                           <Heart
                             className={`h-4 w-4 transition-colors ${
