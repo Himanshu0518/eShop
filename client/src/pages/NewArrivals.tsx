@@ -1,7 +1,7 @@
 import { Heart, ShoppingCart, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useGetProductsPaginatedQuery } from "@/services/product.services";
-import { useAddToCartMutation, useGetCartQuery } from "@/services/cart.services";
+import { useGetProductsPaginatedQuery} from "@/services/product.services";
+import { useAddToCartMutation } from "@/services/cart.services";
 import { useToggleFavouriteMutation, useGetFavoritesQuery } from "@/services/favourites.services";
 import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
