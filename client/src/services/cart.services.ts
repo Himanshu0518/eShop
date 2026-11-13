@@ -37,6 +37,38 @@ export const cartApi = createApi({
         method: 'POST',
         body,
       }),
+
+      // Optimistic update: show item as "in cart" instantly, roll back on failure
+      async onQueryStarted({ productId, quantity }, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          cartApi.util.updateQueryData('getCart', undefined, (draft) => {
+            const existing = draft.data.find((item) => item.productId === productId);
+            if (existing) {
+              // Item already in cart — bump quantity immediately
+              existing.quantity += quantity;
+            } else {
+              // New item — push a placeholder
+              draft.data.push({
+                id: -1, // temporary, replaced on next real fetch
+                userId: -1,
+                productId,
+                quantity,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                product: {} as any,
+              });
+            }
+          })
+        );
+
+        try {
+          await queryFulfilled;
+        } catch {
+          // API failed → undo the optimistic change
+          patchResult.undo();
+        }
+      },
+
       invalidatesTags: ["Cart"]
     }),
 

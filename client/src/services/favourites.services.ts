@@ -24,7 +24,7 @@ export const favouriteApi = createApi({
   }),
 
     endpoints: (builder) => ({
-    // ---------------- CART ----------------
+    // ---------------- FAVOURITES ----------------
   getFavorites: builder.query<FavoriteResponse, void>({
       query: () => '/getAll',
       providesTags: ["Favorite"]
@@ -52,6 +52,36 @@ export const favouriteApi = createApi({
           url: `/toggle/${productId}`,
           method: "PUT"
         }),
+
+        // Optimistic update: flip the heart instantly, roll back if API fails
+        async onQueryStarted({ productId }, { dispatch, queryFulfilled }) {
+          const patchResult = dispatch(
+            favouriteApi.util.updateQueryData('getFavorites', undefined, (draft) => {
+              const index = draft.data.findIndex((f) => f.productId === productId);
+              if (index !== -1) {
+                // Already liked → remove it
+                draft.data.splice(index, 1);
+              } else {
+                // Not liked → add a placeholder entry
+                draft.data.push({
+                  id: -1, // temporary id, will be replaced on next refetch
+                  userId: -1,
+                  productId,
+                  createdAt: new Date().toISOString(),
+                  product: {} as any,
+                });
+              }
+            })
+          );
+
+          try {
+            await queryFulfilled;
+          } catch {
+            // API failed → undo the optimistic change
+            patchResult.undo();
+          }
+        },
+
         invalidatesTags: ["Favorite"]
       }),
     

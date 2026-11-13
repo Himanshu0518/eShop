@@ -2,7 +2,7 @@ import { Heart, ShoppingCart, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGetProductsPaginatedQuery } from "@/services/product.services";
 import { useAddToCartMutation } from "@/services/cart.services";
-import { useToggleFavouriteMutation } from "@/services/favourites.services";
+import { useToggleFavouriteMutation, useGetFavoritesQuery } from "@/services/favourites.services";
 import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -57,6 +57,11 @@ export default function NewArrivals() {
   const [loadingStates, setLoadingStates] = useState<{ [key: number]: { cart: boolean; fav: boolean } }>({});
   const authStatus = useAppSelector((state) => state.auth.status);
 
+  // Derive liked state from cache — no loading state needed for favourites
+  const { data: favoritesData } = useGetFavoritesQuery(undefined, { skip: !authStatus });
+  const isFaved = (productId: number) =>
+    favoritesData?.data?.some((f) => f.productId === productId) ?? false;
+
   const handleAddToCart = async (e: React.MouseEvent, productId: number, productName: string) => {
     e.preventDefault();
     e.stopPropagation();
@@ -91,19 +96,14 @@ export default function NewArrivals() {
       return;
     }
 
-    setLoadingStates(prev => ({ ...prev, [productId]: { ...prev[productId], fav: true } }));
-
+    // No loading state — optimistic update handles the UI instantly
     try {
       await toggleFavourite({ productId }).unwrap();
-      toast.success(`${productName} added to favourites!`, {
-        description: "View your favourites anytime",
-      });
     } catch (error: any) {
+      // patchResult.undo() already fired in onQueryStarted; just show the error
       toast.error("Failed to update favourites", {
         description: error?.data?.message || "Please try again",
       });
-    } finally {
-      setLoadingStates(prev => ({ ...prev, [productId]: { ...prev[productId], fav: false } }));
     }
   };
 
@@ -188,13 +188,12 @@ export default function NewArrivals() {
                           variant="secondary"
                           className="rounded-full h-12 w-12 shadow-lg"
                           onClick={(e) => handleToggleFavourite(e, product.id, product.name)}
-                          disabled={loadingStates[product.id]?.fav}
                         >
-                          {loadingStates[product.id]?.fav ? (
-                            <Spinner className="h-5 w-5" />
-                          ) : (
-                            <Heart className="h-5 w-5" />
-                          )}
+                          <Heart
+                            className={`h-5 w-5 transition-colors ${
+                              isFaved(product.id) ? "fill-red-500 text-red-500" : ""
+                            }`}
+                          />
                         </Button>
                         <Button
                           size="icon"
@@ -220,13 +219,12 @@ export default function NewArrivals() {
                           variant="secondary"
                           className="rounded-full h-9 w-9 shadow-md bg-white/90 hover:bg-white"
                           onClick={(e) => handleToggleFavourite(e, product.id, product.name)}
-                          disabled={loadingStates[product.id]?.fav}
                         >
-                          {loadingStates[product.id]?.fav ? (
-                            <Spinner className="h-4 w-4" />
-                          ) : (
-                            <Heart className="h-4 w-4" />
-                          )}
+                          <Heart
+                            className={`h-4 w-4 transition-colors ${
+                              isFaved(product.id) ? "fill-red-500 text-red-500" : ""
+                            }`}
+                          />
                         </Button>
                         <Button
                           size="icon"

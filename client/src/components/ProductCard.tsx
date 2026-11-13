@@ -5,7 +5,7 @@ import {
   useGetFavoritesQuery,
 } from "@/services/favourites.services";
 import { useAppSelector } from "@/store/authSlice";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
@@ -25,21 +25,17 @@ function ProductCard({ product }: ProductCardProps) {
 
   const [addToCart] = useAddToCartMutation();
   const [toggleFavourite] = useToggleFavouriteMutation();
-  const { data: favouriteProducts, isLoading } = useGetFavoritesQuery(
+
+  // Derive liked state directly from cache — no local state, no useEffect
+  const { data: favouriteProducts } = useGetFavoritesQuery(
     authStatus ? undefined : skipToken
   );
-
-  const [isFavorite, setIsFavorite] = useState(false);
-
-  useEffect(() => {
-    if (favouriteProducts?.data && product?.id) {
-      const isFav = favouriteProducts.data.some((fav) => fav.id === product.id);
-      setIsFavorite(!!isFav);
-    }
-  }, [favouriteProducts?.data, product?.id]);
+  const isFavorite = favouriteProducts?.data?.some(
+    (fav) => fav.productId === product.id
+  ) ?? false;
 
   const [loadingStates, setLoadingStates] = useState<{
-    [key: number]: { cart: boolean; fav: boolean };
+    [key: number]: { cart: boolean };
   }>({});
 
   const handleAddToCart = async (
@@ -86,7 +82,6 @@ function ProductCard({ product }: ProductCardProps) {
   const handleToggleFavourite = async (
     e: React.MouseEvent,
     productId: number,
-    
   ) => {
     e.preventDefault();
     e.stopPropagation();
@@ -102,44 +97,17 @@ function ProductCard({ product }: ProductCardProps) {
       return;
     }
 
-    setLoadingStates((prev) => ({
-      ...prev,
-      [productId]: { ...prev[productId], fav: true },
-    }));
-
-    // Store the current state before toggling
-    const previousFavState = isFavorite;
-    const newFavState = !previousFavState;
-
+    // No loading state — optimistic update in onQueryStarted handles UI instantly
     try {
-      // Optimistically update UI
-      setIsFavorite(newFavState);
-
       const response = await toggleFavourite({ productId }).unwrap();
-
-      // Show appropriate toast based on new state
       toast.success(response.message);
     } catch (error: any) {
-      // Revert to previous state on error
-      setIsFavorite(previousFavState);
+      // patchResult.undo() already fired in onQueryStarted
       toast.error("Failed to update favourites", {
         description: error?.data?.message || "Please try again",
       });
-    } finally {
-      setLoadingStates((prev) => ({
-        ...prev,
-        [productId]: { ...prev[productId], fav: false },
-      }));
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <Spinner />
-      </div>
-    );
-  }
 
   return (
     <div className="group relative">
@@ -160,22 +128,13 @@ function ProductCard({ product }: ProductCardProps) {
                   size="icon"
                   variant="secondary"
                   className="rounded-full h-12 w-12 shadow-lg hover:scale-110 transition-transform bg-white hover:bg-white"
-                  onClick={(e) =>
-                    handleToggleFavourite(e, product.id)
-                  }
-                  disabled={loadingStates[product.id]?.fav}
+                  onClick={(e) => handleToggleFavourite(e, product.id)}
                 >
-                  {loadingStates[product.id]?.fav ? (
-                    <Spinner className="h-5 w-5" />
-                  ) : (
-                    <Heart
-                      className={`h-5 w-5 transition-all ${
-                        isFavorite
-                          ? "fill-gray-700 text-gray-700 stroke-2" // Changed from red to gray
-                          : "text-gray-700 stroke-2"
-                      }`}
-                    />
-                  )}
+                  <Heart
+                    className={`h-5 w-5 transition-all stroke-2 ${
+                      isFavorite ? "fill-gray-700 text-gray-700" : "text-gray-700"
+                    }`}
+                  />
                 </Button>
                 <Button
                   size="icon"
@@ -200,22 +159,13 @@ function ProductCard({ product }: ProductCardProps) {
                   size="icon"
                   variant="secondary"
                   className="rounded-full h-10 w-10 shadow-lg bg-white/95 hover:bg-white backdrop-blur-sm"
-                  onClick={(e) =>
-                    handleToggleFavourite(e, product.id)
-                  }
-                  disabled={loadingStates[product.id]?.fav}
+                  onClick={(e) => handleToggleFavourite(e, product.id)}
                 >
-                  {loadingStates[product.id]?.fav ? (
-                    <Spinner className="h-4 w-4" />
-                  ) : (
-                    <Heart
-                      className={`h-4.5 w-4.5 transition-all ${
-                        isFavorite
-                          ? "fill-gray-700 text-gray-700 stroke-2" // Changed from red to gray
-                          : "text-gray-700 stroke-2"
-                      }`}
-                    />
-                  )}
+                  <Heart
+                    className={`h-4.5 w-4.5 transition-all stroke-2 ${
+                      isFavorite ? "fill-gray-700 text-gray-700" : "text-gray-700"
+                    }`}
+                  />
                 </Button>
                 <Button
                   size="icon"

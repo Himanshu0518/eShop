@@ -7,7 +7,7 @@ const addToFavourite = asyncHandler(async (req, res) => {
     productId  = Number(productId) ;
      
 
-    const userId  = Number(req.user.id) ;
+    const userId  = Number(req.user?.id) ;
     try {
       const item  = await prisma.favorite.create({
             data:{
@@ -29,7 +29,7 @@ const addToFavourite = asyncHandler(async (req, res) => {
 
 const getAllfavourite = asyncHandler(async (req, res) => {
 
-    const userId  = Number(req.user.id) ;
+    const userId  = Number(req.user?.id) ;
 
     try{
         const favorites = await prisma.favorite.findMany({
@@ -78,7 +78,7 @@ const removeFromFavorite = asyncHandler(async (req, res) => {
 
 const toggleFavourite = asyncHandler(async (req, res) => {
     const { productId } = req.params;
-    const userId  = Number(req.user.id) ;
+    const userId  = Number(req.user?.id) ;
     try {
         const existingFavourite = await prisma.favorite.findFirst({
             where: {
@@ -100,6 +100,9 @@ const toggleFavourite = asyncHandler(async (req, res) => {
                 message: `${existingFavourite.product.name} removed from favorites successfully`,
             });
         } else {
+            const product = await prisma.product.findUnique({
+                where: { id: Number(productId) },
+            });
             await prisma.favorite.create({
                 data: {
                     userId: userId,
@@ -108,7 +111,7 @@ const toggleFavourite = asyncHandler(async (req, res) => {
             });
             return res.status(200).json({
                 success: true,
-                message: `${existingFavourite.product.name} added to favorites successfully`,
+                message: `${product?.name ?? 'Item'} added to favorites successfully`,
             });
         }
     } catch (error) {
