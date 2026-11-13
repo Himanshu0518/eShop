@@ -1,13 +1,14 @@
 import { Heart, ShoppingCart, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGetProductsPaginatedQuery } from "@/services/product.services";
-import { useAddToCartMutation } from "@/services/cart.services";
+import { useAddToCartMutation, useGetCartQuery } from "@/services/cart.services";
 import { useToggleFavouriteMutation, useGetFavoritesQuery } from "@/services/favourites.services";
 import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAppSelector } from "@/store/authSlice";
+import { throttle } from "lodash";
 
 export default function NewArrivals() {
   // ── Pagination state ──────────────────────────────────────────
@@ -62,50 +63,54 @@ export default function NewArrivals() {
   const isFaved = (productId: number) =>
     favoritesData?.data?.some((f) => f.productId === productId) ?? false;
 
-  const handleAddToCart = async (e: React.MouseEvent, productId: number, productName: string) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleAddToCart = useCallback(
+    throttle(async (e: React.MouseEvent, productId: number, productName: string) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    if (!authStatus) {
-      toast.error("Please login to add items to cart");
-      return;
-    }
+      if (!authStatus) {
+        toast.error("Please login to add items to cart");
+        return;
+      }
 
-    setLoadingStates(prev => ({ ...prev, [productId]: { ...prev[productId], cart: true } }));
+      setLoadingStates(prev => ({ ...prev, [productId]: { ...prev[productId], cart: true } }));
 
-    try {
-      await addToCart({ productId, quantity: 1 }).unwrap();
-      toast.success(`${productName} added to cart!`, {
-        description: "You can view it in your cart",
-      });
-    } catch (error: any) {
-      toast.error("Failed to add to cart", {
-        description: error?.data?.message || "Please try again",
-      });
-    } finally {
-      setLoadingStates(prev => ({ ...prev, [productId]: { ...prev[productId], cart: false } }));
-    }
-  };
+      try {
+        await addToCart({ productId, quantity: 1 }).unwrap();
+        toast.success(`${productName} added to cart!`, {
+          description: "You can view it in your cart",
+        });
+      } catch (error: any) {
+        toast.error("Failed to add to cart", {
+          description: error?.data?.message || "Please try again",
+        });
+      } finally {
+        setLoadingStates(prev => ({ ...prev, [productId]: { ...prev[productId], cart: false } }));
+      }
+    }, 1000),
+    [authStatus, addToCart]
+  );
 
-  const handleToggleFavourite = async (e: React.MouseEvent, productId: number) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleToggleFavourite = useCallback(
+    throttle(async (e: React.MouseEvent, productId: number) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    if (!authStatus) {
-      toast.error("Please login to add items to favourites");
-      return;
-    }
+      if (!authStatus) {
+        toast.error("Please login to add items to favourites");
+        return;
+      }
 
-    // No loading state — optimistic update handles the UI instantly
-    try {
-      await toggleFavourite({ productId }).unwrap();
-    } catch (error: any) {
-      // patchResult.undo() already fired in onQueryStarted; just show the error
-      toast.error("Failed to update favourites", {
-        description: error?.data?.message || "Please try again",
-      });
-    }
-  };
+      try {
+        await toggleFavourite({ productId }).unwrap();
+      } catch (error: any) {
+        toast.error("Failed to update favourites", {
+          description: error?.data?.message || "Please try again",
+        });
+      }
+    }, 1000),
+    [authStatus, toggleFavourite]
+  );
 
   return (
     <section className="py-12 md:py-20 px-6 md:px-16 lg:px-24 bg-muted/30">

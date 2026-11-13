@@ -5,13 +5,14 @@ import {
   useGetFavoritesQuery,
 } from "@/services/favourites.services";
 import { useAppSelector } from "@/store/authSlice";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import Spinner from "./Spinner";
 import type { Product } from "@/types/product.types";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { throttle } from "lodash";
 
 interface ProductCardProps {
   product: Product;
@@ -38,76 +39,74 @@ function ProductCard({ product }: ProductCardProps) {
     [key: number]: { cart: boolean };
   }>({});
 
-  const handleAddToCart = async (
-    e: React.MouseEvent,
-    productId: number,
-    productName: string
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleAddToCart = useCallback(
+    throttle(async (
+      e: React.MouseEvent,
+      productId: number,
+      productName: string
+    ) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    if (!isLoggedIn) {
-      toast.error("Please login to add items to cart", {
-        description: "You'll be redirected to login page",
-        action: {
-          label: "Login",
-          onClick: () => navigate("/login"),
-        },
-      });
-      return;
-    }
+      if (!isLoggedIn) {
+        toast.error("Please login to add items to cart", {
+          description: "You'll be redirected to login page",
+          action: { label: "Login", onClick: () => navigate("/login") },
+        });
+        return;
+      }
 
-    setLoadingStates((prev) => ({
-      ...prev,
-      [productId]: { ...prev[productId], cart: true },
-    }));
-
-    try {
-      await addToCart({ productId, quantity: 1 }).unwrap();
-      toast.success(`${productName} added to cart!`, {
-        description: "You can view it in your cart",
-      });
-    } catch (error: any) {
-      toast.error("Failed to add to cart", {
-        description: error?.data?.message || "Please try again",
-      });
-    } finally {
       setLoadingStates((prev) => ({
         ...prev,
-        [productId]: { ...prev[productId], cart: false },
+        [productId]: { ...prev[productId], cart: true },
       }));
-    }
-  };
 
-  const handleToggleFavourite = async (
-    e: React.MouseEvent,
-    productId: number,
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
+      try {
+        await addToCart({ productId, quantity: 1 }).unwrap();
+        toast.success(`${productName} added to cart!`, {
+          description: "You can view it in your cart",
+        });
+      } catch (error: any) {
+        toast.error("Failed to add to cart", {
+          description: error?.data?.message || "Please try again",
+        });
+      } finally {
+        setLoadingStates((prev) => ({
+          ...prev,
+          [productId]: { ...prev[productId], cart: false },
+        }));
+      }
+    }, 1000),
+    [isLoggedIn, addToCart, navigate]
+  );
 
-    if (!isLoggedIn) {
-      toast.error("Please login to add items to favourites", {
-        description: "You'll be redirected to login page",
-        action: {
-          label: "Login",
-          onClick: () => navigate("/login"),
-        },
-      });
-      return;
-    }
+  const handleToggleFavourite = useCallback(
+    throttle(async (
+      e: React.MouseEvent,
+      productId: number,
+    ) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    // No loading state — optimistic update in onQueryStarted handles UI instantly
-    try {
-      const response = await toggleFavourite({ productId }).unwrap();
-      toast.success(response.message);
-    } catch (error: any) {
-      // patchResult.undo() already fired in onQueryStarted
-      toast.error("Failed to update favourites", {
-        description: error?.data?.message || "Please try again",
-      });
-    }
-  };
+      if (!isLoggedIn) {
+        toast.error("Please login to add items to favourites", {
+          description: "You'll be redirected to login page",
+          action: { label: "Login", onClick: () => navigate("/login") },
+        });
+        return;
+      }
+
+      try {
+        const response = await toggleFavourite({ productId }).unwrap();
+        toast.success(response.message);
+      } catch (error: any) {
+        toast.error("Failed to update favourites", {
+          description: error?.data?.message || "Please try again",
+        });
+      }
+    }, 1000),
+    [isLoggedIn, toggleFavourite, navigate]
+  );
 
   return (
     <div className="group relative">

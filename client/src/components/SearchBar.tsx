@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, X, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useGetRecommendationByqueryQuery, useGetProductsQuery } from "@/services/product.services";
@@ -12,6 +12,7 @@ import {
 } from "./ui/dialog";
 import { Badge } from "./ui/badge";
 import Spinner from "./Spinner";
+import { debounce } from "lodash";
 
 export default function SearchBar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,12 +23,17 @@ export default function SearchBar() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
+  // lodash debounce — fires 500ms after user stops typing
+  const updateDebouncedQuery = useCallback(
+    debounce((value: string) => setDebouncedQuery(value), 500),
+    []
+  );
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+    updateDebouncedQuery(searchQuery);
+    // Cancel pending debounce on unmount
+    return () => updateDebouncedQuery.cancel();
+  }, [searchQuery, updateDebouncedQuery]);
 
   const { data: allProducts, isFetching: isProductsFetching } = useGetProductsQuery(
     debouncedQuery || undefined,
